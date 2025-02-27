@@ -113,8 +113,6 @@ const LinksTable = () => {
           <div className="p-6 border-b border-gray-100">
             <h1 className="font-display text-2xl font-bold">Диплинки товаров</h1>
           </div>
-          
-          <LinksTableContent />
         </div>
 
         {/* Collapsible Sections */}
