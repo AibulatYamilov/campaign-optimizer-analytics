@@ -1,7 +1,8 @@
 
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { ChevronDown, Trash2 } from "lucide-react";
+import { ChevronDown, Trash2, Home } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 interface LinkItem {
   id: string;
@@ -38,7 +39,12 @@ const LinksTable = () => {
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg z-50 border-b border-gray-100">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="font-display text-xl font-bold">CampaignOptimizer</div>
+            <div className="flex items-center gap-4">
+              <Link to="/" className="font-display text-xl font-bold flex items-center gap-2">
+                <Home className="w-5 h-5" />
+                CampaignOptimizer
+              </Link>
+            </div>
             <button className="bg-primary px-6 py-2 rounded-full text-white font-medium hover:bg-secondary transition-colors">
               Добавить
             </button>

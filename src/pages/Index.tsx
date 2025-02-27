@@ -1,6 +1,7 @@
 
 import { ChartBar, Users, DollarSign, Target, Rocket } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -16,9 +17,14 @@ const Index = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="font-display text-xl font-bold">CampaignOptimizer</div>
-            <button className="bg-primary px-6 py-2 rounded-full text-white font-medium hover:bg-secondary transition-colors">
-              Get Started
-            </button>
+            <div className="flex items-center gap-6">
+              <Link to="/links" className="text-gray-600 hover:text-primary transition-colors">
+                Links Table
+              </Link>
+              <button className="bg-primary px-6 py-2 rounded-full text-white font-medium hover:bg-secondary transition-colors">
+                Get Started
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -39,9 +45,9 @@ const Index = () => {
             <button className="bg-primary px-8 py-3 rounded-full text-white font-medium hover:bg-secondary transition-colors">
               Start Free Trial
             </button>
-            <button className="border border-gray-200 px-8 py-3 rounded-full font-medium hover:bg-gray-50 transition-colors">
-              Watch Demo
-            </button>
+            <Link to="/links" className="border border-gray-200 px-8 py-3 rounded-full font-medium hover:bg-gray-50 transition-colors">
+              View Links Table
+            </Link>
           </div>
         </div>
       </section>
