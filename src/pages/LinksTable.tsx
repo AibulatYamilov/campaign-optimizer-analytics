@@ -3,6 +3,11 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { ChevronDown, Trash2, Home } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
+
+const Collapsible = CollapsiblePrimitive.Root;
+const CollapsibleTrigger = CollapsiblePrimitive.CollapsibleTrigger;
+const CollapsibleContent = CollapsiblePrimitive.CollapsibleContent;
 
 interface LinkItem {
   id: string;
@@ -33,6 +38,56 @@ const LinksTable = () => {
     },
   ]);
 
+  const [openCollapsible, setOpenCollapsible] = useState<string | null>(null);
+
+  const toggleCollapsible = (id: string) => {
+    if (openCollapsible === id) {
+      setOpenCollapsible(null);
+    } else {
+      setOpenCollapsible(id);
+    }
+  };
+
+  // Компонент таблицы с диплинками для повторного использования
+  const LinksTableContent = () => (
+    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mt-2">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[60%]">Диплинк</TableHead>
+            <TableHead className="text-right">Просмотры</TableHead>
+            <TableHead className="w-[100px]"></TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {links.map((link) => (
+            <TableRow key={link.id} className="group">
+              <TableCell className="font-medium">
+                <div className="flex flex-col gap-1">
+                  <span className="text-gray-900">{link.title}</span>
+                  <a 
+                    href={link.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:text-secondary transition-colors text-sm truncate"
+                  >
+                    {link.url}
+                  </a>
+                </div>
+              </TableCell>
+              <TableCell className="text-right">{link.views}</TableCell>
+              <TableCell>
+                <button className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-gray-100 rounded-lg">
+                  <Trash2 className="w-4 h-4 text-gray-500" />
+                </button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -59,40 +114,7 @@ const LinksTable = () => {
             <h1 className="font-display text-2xl font-bold">Диплинки товаров</h1>
           </div>
           
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[60%]">Диплинк</TableHead>
-                <TableHead className="text-right">Просмотры</TableHead>
-                <TableHead className="w-[100px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {links.map((link) => (
-                <TableRow key={link.id} className="group">
-                  <TableCell className="font-medium">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-gray-900">{link.title}</span>
-                      <a 
-                        href={link.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-primary hover:text-secondary transition-colors text-sm truncate"
-                      >
-                        {link.url}
-                      </a>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">{link.views}</TableCell>
-                  <TableCell>
-                    <button className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-gray-100 rounded-lg">
-                      <Trash2 className="w-4 h-4 text-gray-500" />
-                    </button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <LinksTableContent />
         </div>
 
         {/* Collapsible Sections */}
@@ -105,13 +127,30 @@ const LinksTable = () => {
             "Эрик, привет! Смотри что нашел для тебя",
             "Эрик, привет! Смотри, что нашел, это ты на фотография? photo_tusa_40bab_i_1mujik.apk"
           ].map((title, index) => (
-            <button
+            <Collapsible
               key={index}
-              className="w-full flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100 text-left hover:border-primary/20 transition-colors group"
+              open={openCollapsible === String(index)}
+              onOpenChange={() => toggleCollapsible(String(index))}
             >
-              <span className="font-medium text-gray-900">{title}</span>
-              <ChevronDown className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
-            </button>
+              <CollapsibleTrigger className="w-full">
+                <div className="w-full flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100 text-left hover:border-primary/20 transition-colors group">
+                  <span className="font-medium text-gray-900">{title}</span>
+                  <ChevronDown
+                    className={`w-5 h-5 text-gray-400 group-hover:text-primary transition-all ${
+                      openCollapsible === String(index) ? "transform rotate-180" : ""
+                    }`}
+                  />
+                </div>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                {title === "Гантели" && <LinksTableContent />}
+                {title !== "Гантели" && (
+                  <div className="p-4 bg-white border border-t-0 border-gray-100 rounded-b-xl">
+                    <p className="text-gray-600">Содержимое для "{title}" будет здесь...</p>
+                  </div>
+                )}
+              </CollapsibleContent>
+            </Collapsible>
           ))}
         </div>
       </div>
