@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -134,9 +135,10 @@ const SortableProductItem = ({ product, isOpen, onToggle }: {
 };
 
 // Sortable Campaign Row Component
-const SortableCampaignRow = ({ campaign, productId }: { 
+const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }: { 
   campaign: Campaign; 
   productId: string;
+  onUpdatePostLink: (productId: string, campaignId: string, postLink: string) => void;
 }) => {
   const { 
     attributes, 
@@ -145,6 +147,9 @@ const SortableCampaignRow = ({ campaign, productId }: {
     transform, 
     transition 
   } = useSortable({ id: campaign.id });
+
+  const [isEditingPostLink, setIsEditingPostLink] = useState(false);
+  const [postLinkValue, setPostLinkValue] = useState(campaign.postLink || "");
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -171,6 +176,11 @@ const SortableCampaignRow = ({ campaign, productId }: {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Скопировано в буфер обмена");
+  };
+
+  const handleSavePostLink = () => {
+    onUpdatePostLink(productId, campaign.id, postLinkValue);
+    setIsEditingPostLink(false);
   };
 
   return (
@@ -204,16 +214,43 @@ const SortableCampaignRow = ({ campaign, productId }: {
                 campaign.advertiser
               )}
             </div>
-            {campaign.postLink && (
-              <a 
-                href={campaign.postLink} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-xs text-gray-500 hover:underline flex items-center gap-1"
-              >
-                <ExternalLink className="w-3 h-3" />
-                Ссылка на пост
-              </a>
+            {isEditingPostLink ? (
+              <div className="mt-1 flex items-center">
+                <Input
+                  value={postLinkValue}
+                  onChange={(e) => setPostLinkValue(e.target.value)}
+                  placeholder="https://instagram.com/p/example"
+                  className="text-xs h-7 min-w-[200px]"
+                />
+                <button
+                  onClick={handleSavePostLink}
+                  className="ml-2 px-2 py-1 bg-primary text-white text-xs rounded hover:bg-primary/90"
+                >
+                  Сохранить
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center mt-1">
+                {campaign.postLink ? (
+                  <a 
+                    href={campaign.postLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-xs text-gray-500 hover:underline flex items-center gap-1"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    Ссылка на пост
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => setIsEditingPostLink(true)}
+                    className="text-xs text-primary hover:underline flex items-center gap-1"
+                  >
+                    <Plus className="w-3 h-3" />
+                    Добавить ссылку на пост
+                  </button>
+                )}
+              </div>
             )}
             <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
               {campaign.startDate && (
@@ -339,15 +376,13 @@ const LinksTable = () => {
     advertiserLink: string;
     startDate: string;
     cost: string;
-    postLink: string;
   }>({
     productId: "",
     platform: "instagram",
     advertiser: "",
     advertiserLink: "",
     startDate: "",
-    cost: "",
-    postLink: ""
+    cost: ""
   });
 
   const toggleCollapsible = (id: string) => {
@@ -391,7 +426,6 @@ const LinksTable = () => {
           advertiserLink: newCampaign.advertiserLink,
           startDate: newCampaign.startDate ? new Date(newCampaign.startDate) : undefined,
           cost: newCampaign.cost ? Number(newCampaign.cost) : undefined,
-          postLink: newCampaign.postLink,
           deeplink: `https://vneshka.pro/toplink/${generateRandomString()}`,
           totalViews: 0,
           last7DaysViews: 0,
@@ -414,10 +448,34 @@ const LinksTable = () => {
       advertiser: "",
       advertiserLink: "",
       startDate: "",
-      cost: "",
-      postLink: ""
+      cost: ""
     });
     toast.success("Кампания успешно добавлена");
+  };
+
+  const updateCampaignPostLink = (productId: string, campaignId: string, postLink: string) => {
+    const updatedProducts = products.map(product => {
+      if (product.id === productId) {
+        const updatedCampaigns = product.campaigns.map(campaign => {
+          if (campaign.id === campaignId) {
+            return {
+              ...campaign,
+              postLink
+            };
+          }
+          return campaign;
+        });
+        
+        return {
+          ...product,
+          campaigns: updatedCampaigns
+        };
+      }
+      return product;
+    });
+    
+    setProducts(updatedProducts);
+    toast.success("Ссылка на пост добавлена");
   };
 
   const moveProduct = (index: number, direction: "up" | "down") => {
@@ -708,18 +766,6 @@ const LinksTable = () => {
                                     className="rounded-lg"
                                   />
                                 </div>
-                                <div className="grid gap-2">
-                                  <label htmlFor="postLink" className="text-sm font-medium">
-                                    Ссылка на рекламный пост
-                                  </label>
-                                  <Input
-                                    id="postLink"
-                                    value={newCampaign.postLink}
-                                    onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, postLink: e.target.value})}
-                                    placeholder="https://instagram.com/p/example"
-                                    className="rounded-lg"
-                                  />
-                                </div>
                                 <div className="grid grid-cols-2 gap-4">
                                   <div className="grid gap-2">
                                     <label htmlFor="startDate" className="text-sm font-medium">
@@ -750,7 +796,7 @@ const LinksTable = () => {
                               </div>
                               <button 
                                 onClick={handleAddCampaign}
-                                className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary transition-colors text-white font-medium py-2.5 rounded-lg shadow-sm hover:shadow-md"
+                                className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary transition-colors text-white font-medium py-2.5 rounded-lg shadow-md hover:shadow-md"
                               >
                                 Создать кампанию
                               </button>
@@ -788,6 +834,7 @@ const LinksTable = () => {
                                         key={campaign.id} 
                                         campaign={campaign} 
                                         productId={product.id}
+                                        onUpdatePostLink={updateCampaignPostLink}
                                       />
                                     ))}
                                   </SortableContext>
