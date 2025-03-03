@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -66,6 +67,214 @@ interface Product {
   url: string;
   campaigns: Campaign[];
 }
+
+// Sortable Product Item Component
+const SortableProductItem = ({ product, isOpen, onToggle }: { 
+  product: Product; 
+  isOpen: boolean; 
+  onToggle: () => void; 
+}) => {
+  const { 
+    attributes, 
+    listeners, 
+    setNodeRef, 
+    transform, 
+    transition 
+  } = useSortable({ id: product.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className="bg-white rounded-xl border border-gray-200 shadow-md transition-all hover:shadow-lg"
+    >
+      <div className="flex items-center p-4">
+        <div
+          {...attributes}
+          {...listeners}
+          className="mr-2 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600"
+        >
+          <GripVertical className="w-5 h-5" />
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <h2 className="font-semibold text-lg text-gray-800 truncate">{product.title}</h2>
+          <div className="flex items-center mt-1">
+            <a 
+              href={product.url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-sm text-primary flex items-center gap-1 hover:underline truncate"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span className="truncate">{product.url}</span>
+            </a>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2 ml-4">
+          <CollapsibleTrigger asChild>
+            <button
+              onClick={onToggle}
+              className="ml-4 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <ChevronDown className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${
+                isOpen ? "transform rotate-180" : ""
+              }`} />
+            </button>
+          </CollapsibleTrigger>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Sortable Campaign Row Component
+const SortableCampaignRow = ({ campaign, productId }: { 
+  campaign: Campaign; 
+  productId: string;
+}) => {
+  const { 
+    attributes, 
+    listeners, 
+    setNodeRef, 
+    transform, 
+    transition 
+  } = useSortable({ id: campaign.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  const getPlatformIcon = (platform: string) => {
+    switch (platform) {
+      case "instagram":
+        return <Instagram className="w-4 h-4" />;
+      case "youtube":
+        return <Youtube className="w-4 h-4" />;
+      case "telegram":
+        return <Telegram className="w-4 h-4" />;
+      case "vk":
+        return <div className="w-4 h-4 font-bold text-xs">VK</div>;
+      case "tiktok":
+        return <div className="w-4 h-4 font-bold text-xs">TT</div>;
+      default:
+        return <Link2 className="w-4 h-4" />;
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Скопировано в буфер обмена");
+  };
+
+  return (
+    <TableRow ref={setNodeRef} style={style}>
+      <TableCell className="w-[5%]">
+        <div 
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600"
+        >
+          <GripVertical className="w-5 h-5" />
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary/10 text-primary mr-3">
+            {getPlatformIcon(campaign.platform)}
+          </div>
+          <div>
+            <div className="font-medium">
+              {campaign.advertiserLink ? (
+                <a 
+                  href={campaign.advertiserLink} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:underline text-primary"
+                >
+                  {campaign.advertiser}
+                </a>
+              ) : (
+                campaign.advertiser
+              )}
+            </div>
+            {campaign.postLink && (
+              <a 
+                href={campaign.postLink} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-xs text-gray-500 hover:underline flex items-center gap-1"
+              >
+                <ExternalLink className="w-3 h-3" />
+                Ссылка на пост
+              </a>
+            )}
+            <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+              {campaign.startDate && (
+                <div className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3" />
+                  {format(campaign.startDate, "dd.MM.yyyy")}
+                </div>
+              )}
+              {campaign.cost && (
+                <div className="flex items-center gap-1">
+                  <span className="font-medium text-gray-600">{campaign.cost.toLocaleString()}₽</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center gap-2">
+          <div className="max-w-[180px] overflow-hidden">
+            <div className="truncate text-gray-500 text-sm">
+              {campaign.deeplink}
+            </div>
+          </div>
+          <button 
+            onClick={() => copyToClipboard(campaign.deeplink)}
+            className="p-1.5 text-gray-500 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+          >
+            <Copy className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="bg-gray-50 p-2 rounded-lg">
+            <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+              <Eye className="w-3 h-3" />
+              Всего
+            </div>
+            <div className="font-semibold">{campaign.totalViews.toLocaleString()}</div>
+          </div>
+          <div className="bg-gray-50 p-2 rounded-lg">
+            <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+              <BarChart className="w-3 h-3" />
+              7 дней
+            </div>
+            <div className="font-semibold">{campaign.last7DaysViews.toLocaleString()}</div>
+          </div>
+          <div className="bg-gray-50 p-2 rounded-lg">
+            <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              24 часа
+            </div>
+            <div className="font-semibold">{campaign.lastDayViews.toLocaleString()}</div>
+          </div>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+};
 
 const LinksTable = () => {
   const [products, setProducts] = useState<Product[]>([
@@ -289,7 +498,8 @@ const LinksTable = () => {
     }
   };
 
-  const [sensors] = useSensors(
+  // Fix for sensors - wrap with array []
+  const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
