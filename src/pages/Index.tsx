@@ -24,6 +24,9 @@ const Index = () => {
               <Link to="/register" className="text-gray-600 hover:text-primary transition-colors">
                 Регистрация
               </Link>
+              <Link to="/login" className="text-gray-600 hover:text-primary transition-colors">
+                Вход
+              </Link>
               <button className="bg-primary px-6 py-2 rounded-full text-white font-medium hover:bg-secondary transition-colors">
                 Get Started
               </button>
