@@ -1,4 +1,3 @@
-
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
@@ -27,11 +26,11 @@ TableHeader.displayName = "TableHeader"
 
 const TableBody = React.forwardRef<
   HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement> & { isDragging?: boolean }
->(({ className, isDragging, ...props }, ref) => (
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
   <tbody
     ref={ref}
-    className={cn("[&_tr:last-child]:border-0", isDragging ? "cursor-grabbing" : "", className)}
+    className={cn("[&_tr:last-child]:border-0", className)}
     {...props}
   />
 ))
@@ -54,14 +53,12 @@ TableFooter.displayName = "TableFooter"
 
 const TableRow = React.forwardRef<
   HTMLTableRowElement,
-  React.HTMLAttributes<HTMLTableRowElement> & { isDragging?: boolean; isOver?: boolean; dragHandleProps?: any }
->(({ className, isDragging, isOver, dragHandleProps, ...props }, ref) => (
+  React.HTMLAttributes<HTMLTableRowElement>
+>(({ className, ...props }, ref) => (
   <tr
     ref={ref}
     className={cn(
       "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
-      isDragging ? "opacity-50 bg-muted/30" : "",
-      isOver ? "border-dashed border-2 border-primary" : "",
       className
     )}
     {...props}
