@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -340,13 +339,15 @@ const LinksTable = () => {
     advertiserLink: string;
     startDate: string;
     cost: string;
+    postLink: string;
   }>({
     productId: "",
     platform: "instagram",
     advertiser: "",
     advertiserLink: "",
     startDate: "",
-    cost: ""
+    cost: "",
+    postLink: ""
   });
 
   const toggleCollapsible = (id: string) => {
@@ -390,6 +391,7 @@ const LinksTable = () => {
           advertiserLink: newCampaign.advertiserLink,
           startDate: newCampaign.startDate ? new Date(newCampaign.startDate) : undefined,
           cost: newCampaign.cost ? Number(newCampaign.cost) : undefined,
+          postLink: newCampaign.postLink,
           deeplink: `https://vneshka.pro/toplink/${generateRandomString()}`,
           totalViews: 0,
           last7DaysViews: 0,
@@ -412,7 +414,8 @@ const LinksTable = () => {
       advertiser: "",
       advertiserLink: "",
       startDate: "",
-      cost: ""
+      cost: "",
+      postLink: ""
     });
     toast.success("Кампания успешно добавлена");
   };
@@ -498,7 +501,6 @@ const LinksTable = () => {
     }
   };
 
-  // Fix for sensors - wrap with array []
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -706,6 +708,18 @@ const LinksTable = () => {
                                     className="rounded-lg"
                                   />
                                 </div>
+                                <div className="grid gap-2">
+                                  <label htmlFor="postLink" className="text-sm font-medium">
+                                    Ссылка на рекламный пост
+                                  </label>
+                                  <Input
+                                    id="postLink"
+                                    value={newCampaign.postLink}
+                                    onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, postLink: e.target.value})}
+                                    placeholder="https://instagram.com/p/example"
+                                    className="rounded-lg"
+                                  />
+                                </div>
                                 <div className="grid grid-cols-2 gap-4">
                                   <div className="grid gap-2">
                                     <label htmlFor="startDate" className="text-sm font-medium">
@@ -754,7 +768,7 @@ const LinksTable = () => {
                               <TableHeader>
                                 <TableRow className="bg-gray-50">
                                   <TableHead className="w-[5%]"></TableHead>
-                                  <TableHead className="w-[30%]">Кампания</TableHead>
+                                  <TableHead className="w-[30%]">Рекламная кампания</TableHead>
                                   <TableHead className="w-[20%]">Ссылка для рекламной кампании</TableHead>
                                   <TableHead className="w-[45%]">Статистика переходов</TableHead>
                                 </TableRow>
