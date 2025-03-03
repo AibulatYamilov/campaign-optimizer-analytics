@@ -1,19 +1,35 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Home, Mail, Lock, LogIn } from "lucide-react";
+import { Home, Mail, Key, LogIn } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSendCode = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Имитация процесса входа
+    // Имитация отправки кода
+    setTimeout(() => {
+      setLoading(false);
+      setCodeSent(true);
+      toast({
+        title: "Код отправлен",
+        description: `Код подтверждения отправлен на ${email}`,
+      });
+    }, 1500);
+  };
+
+  const handleVerifyCode = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    // Имитация проверки кода
     setTimeout(() => {
       setLoading(false);
       toast({
@@ -59,85 +75,104 @@ const Login = () => {
           <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-gray-100">
               <h1 className="font-display text-2xl font-bold">Вход в аккаунт</h1>
-              <p className="text-gray-500 mt-2">Войдите, чтобы получить доступ к вашему аккаунту</p>
+              <p className="text-gray-500 mt-2">
+                {codeSent 
+                  ? "Введите код, отправленный на ваш email" 
+                  : "Введите ваш email для получения кода доступа"
+                }
+              </p>
             </div>
             
             <div className="p-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                      placeholder="example@mail.com"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                    Пароль
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                      placeholder="Введите пароль"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <input
-                      id="remember-me"
-                      name="remember-me"
-                      type="checkbox"
-                      className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                    />
-                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                      Запомнить меня
+              {!codeSent ? (
+                <form onSubmit={handleSendCode} className="space-y-4">
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
                     </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Mail className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="example@mail.com"
+                        required
+                      />
+                    </div>
                   </div>
-                  <a href="#" className="text-sm font-medium text-primary hover:text-secondary">
-                    Забыли пароль?
-                  </a>
-                </div>
-                
-                <div>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-primary hover:bg-secondary transition-colors py-2 px-4 rounded-lg text-white font-medium flex items-center justify-center gap-2"
-                  >
-                    {loading ? (
-                      <span>Выполняется вход...</span>
-                    ) : (
-                      <>
-                        <LogIn className="w-5 h-5" />
-                        <span>Войти</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
+                  
+                  <div>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-primary hover:bg-secondary transition-colors py-2 px-4 rounded-lg text-white font-medium flex items-center justify-center gap-2"
+                    >
+                      {loading ? (
+                        <span>Отправка кода...</span>
+                      ) : (
+                        <>
+                          <Mail className="w-5 h-5" />
+                          <span>Отправить код</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <form onSubmit={handleVerifyCode} className="space-y-4">
+                  <div>
+                    <label htmlFor="verificationCode" className="block text-sm font-medium text-gray-700 mb-1">
+                      Код подтверждения
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Key className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        id="verificationCode"
+                        type="text"
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value)}
+                        className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="Введите код"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-primary hover:bg-secondary transition-colors py-2 px-4 rounded-lg text-white font-medium flex items-center justify-center gap-2"
+                    >
+                      {loading ? (
+                        <span>Проверка кода...</span>
+                      ) : (
+                        <>
+                          <LogIn className="w-5 h-5" />
+                          <span>Войти</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="text-center">
+                    <button 
+                      type="button" 
+                      onClick={() => setCodeSent(false)}
+                      className="text-primary hover:text-secondary font-medium"
+                    >
+                      Изменить email
+                    </button>
+                  </div>
+                </form>
+              )}
               
               <div className="mt-6 text-center">
                 <p className="text-gray-600">
