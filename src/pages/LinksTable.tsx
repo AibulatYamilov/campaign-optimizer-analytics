@@ -44,7 +44,7 @@ interface Product {
 
 const platformIcons: Record<Platform, React.ReactNode> = {
   instagram: <Instagram className="h-4 w-4" />,
-  tiktok: <MessageCircle className="h-4 w-4" />, // Replaced TikTok with MessageCircle
+  tiktok: <MessageCircle className="h-4 w-4" />, // Используем MessageCircle вместо TikTok
   youtube: <Youtube className="h-4 w-4" />,
   telegram: <MessageCircle className="h-4 w-4" />,
   vk: <MessageCircle className="h-4 w-4" />,
