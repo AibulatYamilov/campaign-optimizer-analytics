@@ -14,7 +14,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, Instagram, TikTok, Youtube, MessageCircle, GripVertical } from "lucide-react";
+import { CalendarIcon, Instagram, Youtube, MessageCircle, GripVertical } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 // Type definitions
@@ -44,7 +44,7 @@ interface Product {
 
 const platformIcons: Record<Platform, React.ReactNode> = {
   instagram: <Instagram className="h-4 w-4" />,
-  tiktok: <TikTok className="h-4 w-4" />,
+  tiktok: <MessageCircle className="h-4 w-4" />, // Replaced TikTok with MessageCircle
   youtube: <Youtube className="h-4 w-4" />,
   telegram: <MessageCircle className="h-4 w-4" />,
   vk: <MessageCircle className="h-4 w-4" />,
