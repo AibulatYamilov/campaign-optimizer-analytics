@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Home, Mail, Key, LogIn } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
@@ -9,6 +8,7 @@ const Login = () => {
   const [verificationCode, setVerificationCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [codeSent, setCodeSent] = useState(false);
+  const navigate = useNavigate();
 
   const handleSendCode = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +36,8 @@ const Login = () => {
         title: "Вход выполнен",
         description: "Добро пожаловать в CampaignOptimizer!",
       });
+      // Перенаправление на страницу с ссылками
+      navigate("/links");
     }, 1500);
   };
 
