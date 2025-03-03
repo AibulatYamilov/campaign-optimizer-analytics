@@ -1,10 +1,8 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { 
   ChevronDown, 
-  Trash2, 
   Home, 
   Plus, 
   ArrowUp, 
@@ -277,20 +275,30 @@ const LinksTable = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-xl z-50 border-b border-gray-100 shadow-sm">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link to="/" className="font-display text-xl font-bold flex items-center gap-2 text-gray-900">
                 <Home className="w-5 h-5 text-primary" />
-                CampaignOptimizer
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">CampaignOptimizer</span>
               </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="container mx-auto px-6 pt-24 pb-20">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-md overflow-hidden">
+          <div className="p-8 border-b border-gray-100 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent flex justify-between items-center">
+            <div>
+              <h1 className="font-display text-2xl font-bold text-gray-900">Ваши товары и рекламные кампании</h1>
+              <p className="text-gray-600 mt-1">Ведите учет рекламных кампаний и отслеживайте их эффективность</p>
             </div>
             <Dialog>
               <DialogTrigger asChild>
-                <button className="bg-primary hover:bg-secondary transition-colors px-6 py-2.5 rounded-full text-white font-medium shadow-md flex items-center gap-2">
+                <button className="bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary transition-all duration-300 px-6 py-2.5 rounded-full text-white font-medium shadow-lg flex items-center gap-2 hover:shadow-xl transform hover:scale-105">
                   <Plus className="w-4 h-4" />
                   Добавить товар
                 </button>
@@ -309,6 +317,7 @@ const LinksTable = () => {
                       value={newProduct.title}
                       onChange={(e) => setNewProduct({...newProduct, title: e.target.value})}
                       placeholder="Введите название товара или услуги"
+                      className="rounded-lg"
                     />
                   </div>
                   <div className="grid gap-2">
@@ -320,12 +329,13 @@ const LinksTable = () => {
                       value={newProduct.url}
                       onChange={(e) => setNewProduct({...newProduct, url: e.target.value})}
                       placeholder="https://example.com/product"
+                      className="rounded-lg"
                     />
                   </div>
                 </div>
                 <button 
                   onClick={handleAddProduct}
-                  className="w-full bg-primary hover:bg-secondary transition-colors text-white font-medium py-2.5 rounded-lg shadow-sm"
+                  className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary transition-colors text-white font-medium py-2.5 rounded-lg shadow-md"
                 >
                   Добавить
                 </button>
@@ -333,21 +343,10 @@ const LinksTable = () => {
             </Dialog>
           </div>
         </div>
-      </nav>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-6 pt-32 pb-20">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-primary/10 to-transparent">
-            <h1 className="font-display text-2xl font-bold text-gray-900">Диплинки товаров</h1>
-            <p className="text-gray-600 mt-1">Управляйте рекламными кампаниями и отслеживайте статистику переходов</p>
-          </div>
-        </div>
-
-        {/* Products List */}
         <div className="mt-8 space-y-4">
           {products.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-2xl border border-gray-100">
+            <div className="text-center py-12 bg-white rounded-2xl border border-gray-200 shadow-md">
               <p className="text-gray-500">У вас пока нет добавленных товаров. Нажмите "Добавить товар", чтобы начать.</p>
             </div>
           ) : (
@@ -358,24 +357,23 @@ const LinksTable = () => {
                 onOpenChange={() => toggleCollapsible(product.id)}
               >
                 <div className="flex flex-col gap-2">
-                  {/* Product Header */}
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => moveProduct(productIndex, "up")}
-                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+                      className="p-2 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50"
                       disabled={productIndex === 0}
                     >
-                      <ArrowUp className="w-4 h-4 text-gray-500" />
+                      <ArrowUp className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => moveProduct(productIndex, "down")}
-                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+                      className="p-2 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50"
                       disabled={productIndex === products.length - 1}
                     >
-                      <ArrowDown className="w-4 h-4 text-gray-500" />
+                      <ArrowDown className="w-4 h-4" />
                     </button>
                     <CollapsibleTrigger className="flex-1">
-                      <div className="w-full flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100 text-left hover:border-primary/20 transition-colors group shadow-sm">
+                      <div className="w-full flex items-center justify-between p-5 bg-white rounded-xl border border-gray-200 text-left hover:border-primary transition-colors group shadow-md hover:shadow-lg">
                         <div className="flex flex-col">
                           <span className="font-semibold text-gray-900">{product.title}</span>
                           <a
@@ -389,7 +387,7 @@ const LinksTable = () => {
                           </a>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium">
+                          <span className="bg-gradient-to-r from-primary/20 to-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium">
                             {product.campaigns.length} {product.campaigns.length === 1 ? "кампания" : 
                               (product.campaigns.length >= 2 && product.campaigns.length <= 4) ? "кампании" : "кампаний"}
                           </span>
@@ -401,22 +399,15 @@ const LinksTable = () => {
                         </div>
                       </div>
                     </CollapsibleTrigger>
-                    <button 
-                      onClick={() => deleteProduct(product.id)}
-                      className="p-2 rounded-lg hover:bg-red-50 hover:text-red-500 transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
                   </div>
 
-                  {/* Campaigns */}
                   <CollapsibleContent>
-                    <div className="pl-10 pr-2 py-2">
+                    <div className="pl-10 pr-2 py-3 animate-fade-up">
                       <div className="flex justify-between items-center mb-4">
                         <h3 className="font-semibold text-gray-700">Рекламные кампании</h3>
                         <Dialog>
                           <DialogTrigger asChild>
-                            <button className="bg-primary/10 hover:bg-primary/20 text-primary transition-colors px-4 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1">
+                            <button className="bg-gradient-to-r from-primary/20 to-primary/10 hover:from-primary/30 hover:to-primary/20 text-primary transition-colors px-4 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1 shadow-sm hover:shadow-md">
                               <Plus className="w-4 h-4" />
                               Добавить кампанию
                             </button>
@@ -440,7 +431,7 @@ const LinksTable = () => {
                                     id="platform"
                                     value={newCampaign.platform}
                                     onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, platform: e.target.value as any})}
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                    className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                   >
                                     <option value="instagram">Instagram</option>
                                     <option value="tiktok">TikTok</option>
@@ -459,6 +450,7 @@ const LinksTable = () => {
                                     value={newCampaign.advertiser}
                                     onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, advertiser: e.target.value})}
                                     placeholder="Имя блогера или канала"
+                                    className="rounded-lg"
                                   />
                                 </div>
                               </div>
@@ -471,6 +463,7 @@ const LinksTable = () => {
                                   value={newCampaign.advertiserLink}
                                   onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, advertiserLink: e.target.value})}
                                   placeholder="https://instagram.com/example"
+                                  className="rounded-lg"
                                 />
                               </div>
                               <div className="grid grid-cols-2 gap-4">
@@ -483,6 +476,7 @@ const LinksTable = () => {
                                     type="date"
                                     value={newCampaign.startDate}
                                     onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, startDate: e.target.value})}
+                                    className="rounded-lg"
                                   />
                                 </div>
                                 <div className="grid gap-2">
@@ -495,13 +489,14 @@ const LinksTable = () => {
                                     value={newCampaign.cost}
                                     onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, cost: e.target.value})}
                                     placeholder="15000"
+                                    className="rounded-lg"
                                   />
                                 </div>
                               </div>
                             </div>
                             <button 
                               onClick={handleAddCampaign}
-                              className="w-full bg-primary hover:bg-secondary transition-colors text-white font-medium py-2.5 rounded-lg shadow-sm"
+                              className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary transition-colors text-white font-medium py-2.5 rounded-lg shadow-sm hover:shadow-md"
                             >
                               Создать кампанию
                             </button>
@@ -510,52 +505,51 @@ const LinksTable = () => {
                       </div>
 
                       {product.campaigns.length === 0 ? (
-                        <div className="text-center py-8 bg-gray-50 rounded-xl border border-gray-100">
+                        <div className="text-center py-8 bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
                           <p className="text-gray-500">У этого товара пока нет рекламных кампаний</p>
                         </div>
                       ) : (
-                        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm">
+                        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-md">
                           <Table>
                             <TableHeader>
-                              <TableRow>
+                              <TableRow className="bg-gray-50">
                                 <TableHead className="w-[5%]"></TableHead>
-                                <TableHead className="w-[25%]">Кампания</TableHead>
-                                <TableHead className="w-[25%]">Диплинк</TableHead>
-                                <TableHead className="w-[30%]">Статистика</TableHead>
-                                <TableHead className="w-[15%] text-right">Действия</TableHead>
+                                <TableHead className="w-[30%]">Кампания</TableHead>
+                                <TableHead className="w-[20%]">Ссылка для рекламной кампании</TableHead>
+                                <TableHead className="w-[45%]">Статистика</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
                               {product.campaigns.map((campaign, campaignIndex) => (
-                                <TableRow key={campaign.id} className="group">
+                                <TableRow key={campaign.id} className="group hover:bg-primary/5">
                                   <TableCell className="p-2">
                                     <div className="flex flex-col items-center gap-1">
                                       <button 
                                         onClick={() => moveCampaign(product.id, campaignIndex, "up")}
-                                        className="p-1 rounded-md hover:bg-gray-100 transition-colors disabled:opacity-50"
+                                        className="p-1 rounded-md hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50"
                                         disabled={campaignIndex === 0}
                                       >
-                                        <ArrowUp className="w-3 h-3 text-gray-500" />
+                                        <ArrowUp className="w-3 h-3" />
                                       </button>
                                       <button 
                                         onClick={() => moveCampaign(product.id, campaignIndex, "down")}
-                                        className="p-1 rounded-md hover:bg-gray-100 transition-colors disabled:opacity-50"
+                                        className="p-1 rounded-md hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50"
                                         disabled={campaignIndex === product.campaigns.length - 1}
                                       >
-                                        <ArrowDown className="w-3 h-3 text-gray-500" />
+                                        <ArrowDown className="w-3 h-3" />
                                       </button>
                                     </div>
                                   </TableCell>
                                   <TableCell>
                                     <div className="flex flex-col gap-1">
                                       <div className="flex items-center gap-1.5">
-                                        <span className={`p-1 rounded-md ${
-                                          campaign.platform === "instagram" ? "bg-pink-100 text-pink-600" : 
-                                          campaign.platform === "tiktok" ? "bg-black text-white" :
-                                          campaign.platform === "youtube" ? "bg-red-100 text-red-600" :
-                                          campaign.platform === "telegram" ? "bg-blue-100 text-blue-600" :
-                                          campaign.platform === "vk" ? "bg-indigo-100 text-indigo-600" :
-                                          "bg-gray-100 text-gray-600"
+                                        <span className={`p-1.5 rounded-md ${
+                                          campaign.platform === "instagram" ? "bg-gradient-to-br from-pink-200 to-pink-100 text-pink-600" : 
+                                          campaign.platform === "tiktok" ? "bg-gradient-to-br from-gray-900 to-gray-800 text-white" :
+                                          campaign.platform === "youtube" ? "bg-gradient-to-br from-red-200 to-red-100 text-red-600" :
+                                          campaign.platform === "telegram" ? "bg-gradient-to-br from-blue-200 to-blue-100 text-blue-600" :
+                                          campaign.platform === "vk" ? "bg-gradient-to-br from-indigo-200 to-indigo-100 text-indigo-600" :
+                                          "bg-gradient-to-br from-gray-200 to-gray-100 text-gray-600"
                                         }`}>
                                           {getPlatformIcon(campaign.platform)}
                                         </span>
@@ -580,8 +574,8 @@ const LinksTable = () => {
                                         )}
                                         {campaign.cost && (
                                           <div className="flex items-center gap-1">
-                                            <DollarSign className="w-3 h-3" />
-                                            {campaign.cost.toLocaleString('ru-RU')} ₽
+                                            <span className="font-medium">₽</span>
+                                            {campaign.cost.toLocaleString('ru-RU')}
                                           </div>
                                         )}
                                       </div>
@@ -589,7 +583,7 @@ const LinksTable = () => {
                                   </TableCell>
                                   <TableCell>
                                     <div className="flex items-center gap-2">
-                                      <div className="flex-1 overflow-hidden">
+                                      <div className="max-w-36 overflow-hidden">
                                         <a 
                                           href={campaign.deeplink}
                                           target="_blank"
@@ -601,10 +595,10 @@ const LinksTable = () => {
                                       </div>
                                       <button
                                         onClick={() => copyToClipboard(campaign.deeplink)}
-                                        className="p-1.5 rounded-md hover:bg-gray-100 transition-colors"
+                                        className="p-1.5 rounded-md hover:bg-primary/10 hover:text-primary transition-colors"
                                         title="Копировать ссылку"
                                       >
-                                        <Copy className="w-3.5 h-3.5 text-gray-500" />
+                                        <Copy className="w-3.5 h-3.5" />
                                       </button>
                                     </div>
                                     <Dialog>
@@ -621,31 +615,32 @@ const LinksTable = () => {
                                           <Input
                                             placeholder="https://instagram.com/p/example"
                                             defaultValue={campaign.postLink || ""}
+                                            className="rounded-lg"
                                           />
                                         </div>
-                                        <button className="w-full bg-primary hover:bg-secondary transition-colors text-white font-medium py-2 rounded-lg">
+                                        <button className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary transition-colors text-white font-medium py-2 rounded-lg">
                                           Сохранить
                                         </button>
                                       </DialogContent>
                                     </Dialog>
                                   </TableCell>
                                   <TableCell>
-                                    <div className="grid grid-cols-3 gap-4">
-                                      <div className="flex flex-col items-center bg-primary/5 rounded-lg p-2">
+                                    <div className="grid grid-cols-3 gap-3">
+                                      <div className="flex flex-col items-center bg-gradient-to-br from-primary/15 to-primary/5 rounded-lg p-2 shadow-sm">
                                         <div className="flex items-center gap-1.5 text-xs text-gray-500">
                                           <Eye className="w-3 h-3" />
                                           <span>Всего</span>
                                         </div>
                                         <span className="font-semibold text-primary text-lg">{campaign.totalViews}</span>
                                       </div>
-                                      <div className="flex flex-col items-center bg-gray-50 rounded-lg p-2">
+                                      <div className="flex flex-col items-center bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg p-2 shadow-sm">
                                         <div className="flex items-center gap-1.5 text-xs text-gray-500">
                                           <BarChart className="w-3 h-3" />
                                           <span>7 дней</span>
                                         </div>
                                         <span className="font-semibold text-gray-700 text-lg">{campaign.last7DaysViews}</span>
                                       </div>
-                                      <div className="flex flex-col items-center bg-gray-50 rounded-lg p-2">
+                                      <div className="flex flex-col items-center bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg p-2 shadow-sm">
                                         <div className="flex items-center gap-1.5 text-xs text-gray-500">
                                           <Clock className="w-3 h-3" />
                                           <span>24 часа</span>
@@ -657,20 +652,11 @@ const LinksTable = () => {
                                       <span className="text-gray-500">Длительность: {campaign.durationDays} дн.</span>
                                       
                                       {campaign.cost && campaign.totalViews > 0 && (
-                                        <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                        <span className="bg-gradient-to-r from-green-100 to-green-50 text-green-700 px-2 py-0.5 rounded-full shadow-sm">
                                           {Math.round(campaign.cost / campaign.totalViews)} ₽/клик
                                         </span>
                                       )}
                                     </div>
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    <button
-                                      onClick={() => deleteCampaign(product.id, campaign.id)}
-                                      className="p-2 rounded-lg hover:bg-red-50 hover:text-red-500 transition-colors"
-                                      title="Удалить кампанию"
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </button>
                                   </TableCell>
                                 </TableRow>
                               ))}
