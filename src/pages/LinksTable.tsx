@@ -1,26 +1,24 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { 
   ChevronDown, 
-  Trash2, 
   Home, 
   Plus, 
-  ArrowUp, 
-  ArrowDown,
   Instagram,
   Youtube,
   MessageCircle as Telegram,
   Link2,
   ExternalLink,
   Calendar,
-  DollarSign,
   BarChart,
   Clock,
   Eye,
   Copy,
-  Pencil
+  Pencil,
+  GripVertical,
+  CircleRuble
 } from "lucide-react";
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
 import { toast } from "sonner";
@@ -126,6 +124,10 @@ const LinksTable = () => {
     startDate: "",
     cost: ""
   });
+  
+  // Refs for drag and drop functionality
+  const dragProduct = useRef<{ index: number } | null>(null);
+  const dragCampaign = useRef<{ productId: string, index: number } | null>(null);
 
   const toggleCollapsible = (id: string) => {
     if (openCollapsible === id) {
@@ -195,38 +197,68 @@ const LinksTable = () => {
     toast.success("Кампания успешно добавлена");
   };
 
-  const moveProduct = (index: number, direction: "up" | "down") => {
-    if ((direction === "up" && index === 0) || 
-        (direction === "down" && index === products.length - 1)) {
-      return;
-    }
-
-    const newProducts = [...products];
-    const targetIndex = direction === "up" ? index - 1 : index + 1;
-    [newProducts[index], newProducts[targetIndex]] = [newProducts[targetIndex], newProducts[index]];
-    setProducts(newProducts);
+  // Drag and drop handlers for products
+  const handleProductDragStart = (index: number) => {
+    dragProduct.current = { index };
   };
 
-  const moveCampaign = (productId: string, campaignIndex: number, direction: "up" | "down") => {
+  const handleProductDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (dragProduct.current === null) return;
+    
+    const dragIndex = dragProduct.current.index;
+    if (dragIndex === index) return;
+    
+    const newProducts = [...products];
+    const draggedItem = newProducts[dragIndex];
+    
+    // Remove the dragged item
+    newProducts.splice(dragIndex, 1);
+    // Insert it at the new position
+    newProducts.splice(index, 0, draggedItem);
+    
+    setProducts(newProducts);
+    dragProduct.current.index = index;
+  };
+
+  const handleProductDragEnd = () => {
+    dragProduct.current = null;
+  };
+
+  // Drag and drop handlers for campaigns
+  const handleCampaignDragStart = (productId: string, index: number) => {
+    dragCampaign.current = { productId, index };
+  };
+
+  const handleCampaignDragOver = (e: React.DragEvent, productId: string, index: number) => {
+    e.preventDefault();
+    if (dragCampaign.current === null || dragCampaign.current.productId !== productId) return;
+    
+    const dragIndex = dragCampaign.current.index;
+    if (dragIndex === index) return;
+    
     const productIndex = products.findIndex(p => p.id === productId);
     if (productIndex === -1) return;
-
-    const campaigns = [...products[productIndex].campaigns];
-    if ((direction === "up" && campaignIndex === 0) || 
-        (direction === "down" && campaignIndex === campaigns.length - 1)) {
-      return;
-    }
-
-    const targetIndex = direction === "up" ? campaignIndex - 1 : campaignIndex + 1;
-    [campaigns[campaignIndex], campaigns[targetIndex]] = [campaigns[targetIndex], campaigns[campaignIndex]];
-
-    const updatedProducts = [...products];
-    updatedProducts[productIndex] = {
-      ...updatedProducts[productIndex],
+    
+    const newProducts = [...products];
+    const campaigns = [...newProducts[productIndex].campaigns];
+    
+    // Reorder campaigns
+    const draggedItem = campaigns[dragIndex];
+    campaigns.splice(dragIndex, 1);
+    campaigns.splice(index, 0, draggedItem);
+    
+    newProducts[productIndex] = {
+      ...newProducts[productIndex],
       campaigns
     };
+    
+    setProducts(newProducts);
+    dragCampaign.current.index = index;
+  };
 
-    setProducts(updatedProducts);
+  const handleCampaignDragEnd = () => {
+    dragCampaign.current = null;
   };
 
   const copyToClipboard = (text: string) => {
@@ -237,26 +269,6 @@ const LinksTable = () => {
   const generateRandomString = () => {
     return Math.random().toString(36).substring(2, 15) + 
            Math.random().toString(36).substring(2, 15);
-  };
-
-  const deleteProduct = (productId: string) => {
-    setProducts(products.filter(p => p.id !== productId));
-    toast.success("Товар удален");
-  };
-
-  const deleteCampaign = (productId: string, campaignId: string) => {
-    const updatedProducts = products.map(product => {
-      if (product.id === productId) {
-        return {
-          ...product,
-          campaigns: product.campaigns.filter(c => c.id !== campaignId)
-        };
-      }
-      return product;
-    });
-
-    setProducts(updatedProducts);
-    toast.success("Кампания удалена");
   };
 
   const getPlatformIcon = (platform: string) => {
@@ -288,49 +300,6 @@ const LinksTable = () => {
                 CampaignOptimizer
               </Link>
             </div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <button className="bg-primary hover:bg-secondary transition-colors px-6 py-2.5 rounded-full text-white font-medium shadow-md flex items-center gap-2">
-                  <Plus className="w-4 h-4" />
-                  Добавить товар
-                </button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-display">Добавить новый товар</DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <label htmlFor="title" className="text-sm font-medium">
-                      Наименование товара *
-                    </label>
-                    <Input
-                      id="title"
-                      value={newProduct.title}
-                      onChange={(e) => setNewProduct({...newProduct, title: e.target.value})}
-                      placeholder="Введите название товара или услуги"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <label htmlFor="url" className="text-sm font-medium">
-                      Ссылка на товар *
-                    </label>
-                    <Input
-                      id="url"
-                      value={newProduct.url}
-                      onChange={(e) => setNewProduct({...newProduct, url: e.target.value})}
-                      placeholder="https://example.com/product"
-                    />
-                  </div>
-                </div>
-                <button 
-                  onClick={handleAddProduct}
-                  className="w-full bg-primary hover:bg-secondary transition-colors text-white font-medium py-2.5 rounded-lg shadow-sm"
-                >
-                  Добавить
-                </button>
-              </DialogContent>
-            </Dialog>
           </div>
         </div>
       </nav>
@@ -339,8 +308,55 @@ const LinksTable = () => {
       <div className="container mx-auto px-6 pt-32 pb-20">
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-primary/10 to-transparent">
-            <h1 className="font-display text-2xl font-bold text-gray-900">Диплинки товаров</h1>
-            <p className="text-gray-600 mt-1">Управляйте рекламными кампаниями и отслеживайте статистику переходов</p>
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="font-display text-2xl font-bold text-gray-900">Ваши товары и рекламные кампании</h1>
+                <p className="text-gray-600 mt-1">Ведите учет рекламных кампаний и отслеживайте их эффективность</p>
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="bg-primary hover:bg-secondary transition-colors px-6 py-2.5 rounded-full text-white font-medium shadow-md flex items-center gap-2">
+                    <Plus className="w-4 h-4" />
+                    Добавить товар
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-display">Добавить новый товар</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid gap-2">
+                      <label htmlFor="title" className="text-sm font-medium">
+                        Наименование товара *
+                      </label>
+                      <Input
+                        id="title"
+                        value={newProduct.title}
+                        onChange={(e) => setNewProduct({...newProduct, title: e.target.value})}
+                        placeholder="Введите название товара или услуги"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <label htmlFor="url" className="text-sm font-medium">
+                        Ссылка на товар *
+                      </label>
+                      <Input
+                        id="url"
+                        value={newProduct.url}
+                        onChange={(e) => setNewProduct({...newProduct, url: e.target.value})}
+                        placeholder="https://example.com/product"
+                      />
+                    </div>
+                  </div>
+                  <button 
+                    onClick={handleAddProduct}
+                    className="w-full bg-primary hover:bg-secondary transition-colors text-white font-medium py-2.5 rounded-lg shadow-sm"
+                  >
+                    Добавить
+                  </button>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
 
@@ -359,34 +375,29 @@ const LinksTable = () => {
               >
                 <div className="flex flex-col gap-2">
                   {/* Product Header */}
-                  <div className="flex items-center gap-2">
-                    <button 
-                      onClick={() => moveProduct(productIndex, "up")}
-                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
-                      disabled={productIndex === 0}
-                    >
-                      <ArrowUp className="w-4 h-4 text-gray-500" />
-                    </button>
-                    <button 
-                      onClick={() => moveProduct(productIndex, "down")}
-                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
-                      disabled={productIndex === products.length - 1}
-                    >
-                      <ArrowDown className="w-4 h-4 text-gray-500" />
-                    </button>
-                    <CollapsibleTrigger className="flex-1">
+                  <div 
+                    draggable
+                    onDragStart={() => handleProductDragStart(productIndex)}
+                    onDragOver={(e) => handleProductDragOver(e, productIndex)}
+                    onDragEnd={handleProductDragEnd}
+                    className="cursor-grab active:cursor-grabbing"
+                  >
+                    <CollapsibleTrigger className="w-full">
                       <div className="w-full flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100 text-left hover:border-primary/20 transition-colors group shadow-sm">
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-gray-900">{product.title}</span>
-                          <a
-                            href={product.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:text-secondary transition-colors text-sm truncate mt-1 flex items-center gap-1"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Link2 className="w-3 h-3" /> {product.url}
-                          </a>
+                        <div className="flex items-center gap-3">
+                          <GripVertical className="w-5 h-5 text-gray-400" />
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-gray-900">{product.title}</span>
+                            <a
+                              href={product.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:text-secondary transition-colors text-sm truncate mt-1 flex items-center gap-1"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Link2 className="w-3 h-3" /> {product.url}
+                            </a>
+                          </div>
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium">
@@ -401,12 +412,6 @@ const LinksTable = () => {
                         </div>
                       </div>
                     </CollapsibleTrigger>
-                    <button 
-                      onClick={() => deleteProduct(product.id)}
-                      className="p-2 rounded-lg hover:bg-red-50 hover:text-red-500 transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
                   </div>
 
                   {/* Campaigns */}
@@ -520,33 +525,26 @@ const LinksTable = () => {
                               <TableRow>
                                 <TableHead className="w-[5%]"></TableHead>
                                 <TableHead className="w-[25%]">Кампания</TableHead>
-                                <TableHead className="w-[25%]">Диплинк</TableHead>
-                                <TableHead className="w-[30%]">Статистика</TableHead>
-                                <TableHead className="w-[15%] text-right">Действия</TableHead>
+                                <TableHead className="w-[30%]">Ссылка для рекламной кампании</TableHead>
+                                <TableHead className="w-[40%]">Статистика</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
                               {product.campaigns.map((campaign, campaignIndex) => (
-                                <TableRow key={campaign.id} className="group">
-                                  <TableCell className="p-2">
-                                    <div className="flex flex-col items-center gap-1">
-                                      <button 
-                                        onClick={() => moveCampaign(product.id, campaignIndex, "up")}
-                                        className="p-1 rounded-md hover:bg-gray-100 transition-colors disabled:opacity-50"
-                                        disabled={campaignIndex === 0}
-                                      >
-                                        <ArrowUp className="w-3 h-3 text-gray-500" />
-                                      </button>
-                                      <button 
-                                        onClick={() => moveCampaign(product.id, campaignIndex, "down")}
-                                        className="p-1 rounded-md hover:bg-gray-100 transition-colors disabled:opacity-50"
-                                        disabled={campaignIndex === product.campaigns.length - 1}
-                                      >
-                                        <ArrowDown className="w-3 h-3 text-gray-500" />
-                                      </button>
+                                <TableRow 
+                                  key={campaign.id} 
+                                  className="group"
+                                  draggable
+                                  onDragStart={() => handleCampaignDragStart(product.id, campaignIndex)}
+                                  onDragOver={(e) => handleCampaignDragOver(e, product.id, campaignIndex)}
+                                  onDragEnd={handleCampaignDragEnd}
+                                >
+                                  <TableCell className="p-2 w-[5%] cursor-grab active:cursor-grabbing">
+                                    <div className="flex items-center justify-center">
+                                      <GripVertical className="w-4 h-4 text-gray-400" />
                                     </div>
                                   </TableCell>
-                                  <TableCell>
+                                  <TableCell className="w-[25%]">
                                     <div className="flex flex-col gap-1">
                                       <div className="flex items-center gap-1.5">
                                         <span className={`p-1 rounded-md ${
@@ -580,21 +578,22 @@ const LinksTable = () => {
                                         )}
                                         {campaign.cost && (
                                           <div className="flex items-center gap-1">
-                                            <DollarSign className="w-3 h-3" />
+                                            <CircleRuble className="w-3 h-3" />
                                             {campaign.cost.toLocaleString('ru-RU')} ₽
                                           </div>
                                         )}
                                       </div>
                                     </div>
                                   </TableCell>
-                                  <TableCell>
+                                  <TableCell className="w-[30%]">
                                     <div className="flex items-center gap-2">
-                                      <div className="flex-1 overflow-hidden">
+                                      <div className="w-[200px] overflow-hidden">
                                         <a 
                                           href={campaign.deeplink}
                                           target="_blank"
                                           rel="noopener noreferrer"
                                           className="text-primary hover:text-secondary transition-colors text-sm truncate block"
+                                          title={campaign.deeplink}
                                         >
                                           {campaign.deeplink}
                                         </a>
@@ -629,7 +628,7 @@ const LinksTable = () => {
                                       </DialogContent>
                                     </Dialog>
                                   </TableCell>
-                                  <TableCell>
+                                  <TableCell className="w-[40%]">
                                     <div className="grid grid-cols-3 gap-4">
                                       <div className="flex flex-col items-center bg-primary/5 rounded-lg p-2">
                                         <div className="flex items-center gap-1.5 text-xs text-gray-500">
@@ -662,15 +661,6 @@ const LinksTable = () => {
                                         </span>
                                       )}
                                     </div>
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    <button
-                                      onClick={() => deleteCampaign(product.id, campaign.id)}
-                                      className="p-2 rounded-lg hover:bg-red-50 hover:text-red-500 transition-colors"
-                                      title="Удалить кампанию"
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </button>
                                   </TableCell>
                                 </TableRow>
                               ))}
