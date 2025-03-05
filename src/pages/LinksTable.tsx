@@ -16,7 +16,8 @@ import {
   Eye,
   Copy,
   Pencil,
-  GripVertical
+  GripVertical,
+  Check
 } from "lucide-react";
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
 import { toast } from "sonner";
@@ -383,6 +384,9 @@ const LinksTable = () => {
   });
   
   const [isAddProductDialogOpen, setIsAddProductDialogOpen] = useState(false);
+  const [isAddCampaignDialogOpen, setIsAddCampaignDialogOpen] = useState(false);
+  const [isGeneratedLinkDialogOpen, setIsGeneratedLinkDialogOpen] = useState(false);
+  const [generatedLink, setGeneratedLink] = useState("");
 
   const toggleCollapsible = (id: string) => {
     if (openCollapsible === id) {
@@ -418,6 +422,8 @@ const LinksTable = () => {
       return;
     }
 
+    const generatedDeeplink = `https://vneshka.pro/toplink/${generateRandomString()}`;
+
     const updatedProducts = products.map(product => {
       if (product.id === newCampaign.productId) {
         const newCampaignObj: Campaign = {
@@ -427,7 +433,7 @@ const LinksTable = () => {
           advertiserLink: newCampaign.advertiserLink,
           startDate: newCampaign.startDate ? new Date(newCampaign.startDate) : undefined,
           cost: newCampaign.cost ? Number(newCampaign.cost) : undefined,
-          deeplink: `https://vneshka.pro/toplink/${generateRandomString()}`,
+          deeplink: generatedDeeplink,
           totalViews: 0,
           last7DaysViews: 0,
           lastDayViews: 0,
@@ -443,6 +449,7 @@ const LinksTable = () => {
     });
 
     setProducts(updatedProducts);
+    setGeneratedLink(generatedDeeplink);
     setNewCampaign({
       productId: "",
       platform: "instagram",
@@ -451,6 +458,10 @@ const LinksTable = () => {
       startDate: "",
       cost: ""
     });
+    
+    setIsAddCampaignDialogOpen(false);
+    setIsGeneratedLinkDialogOpen(true);
+    
     toast.success("Кампания успешно добавлена");
   };
 
@@ -706,7 +717,7 @@ const LinksTable = () => {
                       <div className="pl-10 pr-2 py-3 animate-fade-up">
                         <div className="flex justify-between items-center mb-4">
                           <h3 className="font-semibold text-gray-700">Рекламные кампании</h3>
-                          <Dialog>
+                          <Dialog open={isAddCampaignDialogOpen} onOpenChange={setIsAddCampaignDialogOpen}>
                             <DialogTrigger asChild>
                               <button className="bg-gradient-to-r from-primary/20 to-primary/10 hover:from-primary/30 hover:to-primary/20 text-primary transition-colors px-4 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1 shadow-sm hover:shadow-md">
                                 <Plus className="w-4 h-4" />
@@ -853,6 +864,46 @@ const LinksTable = () => {
           )}
         </div>
       </div>
+
+      <Dialog 
+        open={isGeneratedLinkDialogOpen} 
+        onOpenChange={setIsGeneratedLinkDialogOpen}
+      >
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-display">Ссылка для кампании создана</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-700 mb-4">
+              Сгенерировали ссылку для этой рекламной кампании. 
+              Попросите рекламодателя указать эту ссылку в рекламном посте.
+            </p>
+            <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+              <div className="flex-1 font-mono text-sm text-gray-700 break-all">
+                {generatedLink}
+              </div>
+              <button 
+                onClick={() => {
+                  copyToClipboard(generatedLink);
+                }}
+                className="p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                title="Скопировать ссылку"
+              >
+                <Copy className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button 
+                onClick={() => setIsGeneratedLinkDialogOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg"
+              >
+                <Check className="w-4 h-4" />
+                Готово
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
