@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -68,7 +67,6 @@ interface Product {
   campaigns: Campaign[];
 }
 
-// Sortable Product Item Component
 const SortableProductItem = ({ product, isOpen, onToggle }: { 
   product: Product; 
   isOpen: boolean; 
@@ -134,7 +132,6 @@ const SortableProductItem = ({ product, isOpen, onToggle }: {
   );
 };
 
-// Sortable Campaign Row Component
 const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }: { 
   campaign: Campaign; 
   productId: string;
@@ -384,6 +381,8 @@ const LinksTable = () => {
     startDate: "",
     cost: ""
   });
+  
+  const [isAddProductDialogOpen, setIsAddProductDialogOpen] = useState(false);
 
   const toggleCollapsible = (id: string) => {
     if (openCollapsible === id) {
@@ -406,9 +405,11 @@ const LinksTable = () => {
       campaigns: []
     };
 
-    setProducts([...products, newProductObj]);
+    setProducts([newProductObj, ...products]);
     setNewProduct({ title: "", url: "" });
     toast.success("Товар успешно добавлен");
+    
+    setIsAddProductDialogOpen(false);
   };
 
   const handleAddCampaign = () => {
@@ -626,7 +627,7 @@ const LinksTable = () => {
               <h1 className="font-display text-2xl font-bold text-gray-900">Ваши товары и рекламные кампании</h1>
               <p className="text-gray-600 mt-1">Ведите учет рекламных кампаний и отслеживайте их эффективность</p>
             </div>
-            <Dialog>
+            <Dialog open={isAddProductDialogOpen} onOpenChange={setIsAddProductDialogOpen}>
               <DialogTrigger asChild>
                 <button className="bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary transition-all duration-300 px-6 py-2.5 rounded-full text-white font-medium shadow-lg flex items-center gap-2 hover:shadow-xl transform hover:scale-105">
                   <Plus className="w-4 h-4" />
