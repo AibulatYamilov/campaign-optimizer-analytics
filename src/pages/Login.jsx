@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Key, LogIn } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import Logo from "@/components/Logo";
+import Logo from "@/components/Logo.jsx";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +21,7 @@ const Login = () => {
   const [showNotRegisteredDialog, setShowNotRegisteredDialog] = useState(false);
   const navigate = useNavigate();
 
-  const handleSendCode = (e: React.FormEvent) => {
+  const handleSendCode = (e) => {
     e.preventDefault();
     setLoading(true);
 
@@ -42,7 +43,7 @@ const Login = () => {
     }, 1500);
   };
 
-  const handleVerifyCode = (e: React.FormEvent) => {
+  const handleVerifyCode = (e) => {
     e.preventDefault();
     setLoading(true);
 

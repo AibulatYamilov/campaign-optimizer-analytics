@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -32,7 +33,6 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -47,33 +47,7 @@ const Collapsible = CollapsiblePrimitive.Root;
 const CollapsibleTrigger = CollapsiblePrimitive.CollapsibleTrigger;
 const CollapsibleContent = CollapsiblePrimitive.CollapsibleContent;
 
-interface Campaign {
-  id: string;
-  platform: "instagram" | "tiktok" | "youtube" | "telegram" | "vk" | "other";
-  advertiser: string;
-  advertiserLink?: string;
-  startDate?: Date;
-  cost?: number;
-  postLink?: string;
-  deeplink: string;
-  totalViews: number;
-  last7DaysViews: number;
-  lastDayViews: number;
-  durationDays: number;
-}
-
-interface Product {
-  id: string;
-  title: string;
-  url: string;
-  campaigns: Campaign[];
-}
-
-const SortableProductItem = ({ product, isOpen, onToggle }: { 
-  product: Product; 
-  isOpen: boolean; 
-  onToggle: () => void; 
-}) => {
+const SortableProductItem = ({ product, isOpen, onToggle }) => {
   const { 
     attributes, 
     listeners, 
@@ -134,11 +108,7 @@ const SortableProductItem = ({ product, isOpen, onToggle }: {
   );
 };
 
-const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }: { 
-  campaign: Campaign; 
-  productId: string;
-  onUpdatePostLink: (productId: string, campaignId: string, postLink: string) => void;
-}) => {
+const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }) => {
   const { 
     attributes, 
     listeners, 
@@ -155,7 +125,7 @@ const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }: {
     transition,
   };
 
-  const getPlatformIcon = (platform: string) => {
+  const getPlatformIcon = (platform) => {
     switch (platform) {
       case "instagram":
         return <Instagram className="w-4 h-4" />;
@@ -172,7 +142,7 @@ const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }: {
     }
   };
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     toast.success("Скопировано в буфер обмена");
   };
@@ -312,7 +282,7 @@ const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }: {
 };
 
 const LinksTable = () => {
-  const [products, setProducts] = useState<Product[]>([
+  const [products, setProducts] = useState([
     {
       id: "1",
       title: "Бусы из натуральных камней Горный Хрусталь",
@@ -366,16 +336,9 @@ const LinksTable = () => {
     }
   ]);
 
-  const [openCollapsible, setOpenCollapsible] = useState<string | null>(null);
+  const [openCollapsible, setOpenCollapsible] = useState(null);
   const [newProduct, setNewProduct] = useState({ title: "", url: "" });
-  const [newCampaign, setNewCampaign] = useState<{
-    productId: string;
-    platform: "instagram" | "tiktok" | "youtube" | "telegram" | "vk" | "other";
-    advertiser: string;
-    advertiserLink: string;
-    startDate: string;
-    cost: string;
-  }>({
+  const [newCampaign, setNewCampaign] = useState({
     productId: "",
     platform: "instagram",
     advertiser: "",
@@ -396,7 +359,7 @@ const LinksTable = () => {
     linksLimit: 10
   };
 
-  const toggleCollapsible = (id: string) => {
+  const toggleCollapsible = (id) => {
     if (openCollapsible === id) {
       setOpenCollapsible(null);
     } else {
@@ -410,7 +373,7 @@ const LinksTable = () => {
       return;
     }
 
-    const newProductObj: Product = {
+    const newProductObj = {
       id: Date.now().toString(),
       title: newProduct.title,
       url: newProduct.url,
@@ -440,7 +403,7 @@ const LinksTable = () => {
 
     const updatedProducts = products.map(product => {
       if (product.id === newCampaign.productId) {
-        const newCampaignObj: Campaign = {
+        const newCampaignObj = {
           id: `${product.id}-${product.campaigns.length + 1}`,
           platform: newCampaign.platform,
           advertiser: newCampaign.advertiser,
@@ -481,7 +444,7 @@ const LinksTable = () => {
     toast.success("Кампания успешно добавлена");
   };
 
-  const updateCampaignPostLink = (productId: string, campaignId: string, postLink: string) => {
+  const updateCampaignPostLink = (productId, campaignId, postLink) => {
     const updatedProducts = products.map(product => {
       if (product.id === productId) {
         const updatedCampaigns = product.campaigns.map(campaign => {
@@ -506,7 +469,7 @@ const LinksTable = () => {
     toast.success("Ссылка на пост добавлена");
   };
 
-  const moveProduct = (index: number, direction: "up" | "down") => {
+  const moveProduct = (index, direction) => {
     if ((direction === "up" && index === 0) || 
         (direction === "down" && index === products.length - 1)) {
       return;
@@ -518,7 +481,7 @@ const LinksTable = () => {
     setProducts(newProducts);
   };
 
-  const moveCampaign = (productId: string, campaignIndex: number, direction: "up" | "down") => {
+  const moveCampaign = (productId, campaignIndex, direction) => {
     const productIndex = products.findIndex(p => p.id === productId);
     if (productIndex === -1) return;
 
@@ -540,7 +503,7 @@ const LinksTable = () => {
     setProducts(updatedProducts);
   };
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     toast.success("Скопировано в буфер обмена");
   };
@@ -550,12 +513,12 @@ const LinksTable = () => {
            Math.random().toString(36).substring(2, 15);
   };
 
-  const deleteProduct = (productId: string) => {
+  const deleteProduct = (productId) => {
     setProducts(products.filter(p => p.id !== productId));
     toast.success("Товар удален");
   };
 
-  const deleteCampaign = (productId: string, campaignId: string) => {
+  const deleteCampaign = (productId, campaignId) => {
     const updatedProducts = products.map(product => {
       if (product.id === productId) {
         return {
@@ -570,7 +533,7 @@ const LinksTable = () => {
     toast.success("Кампания удалена");
   };
 
-  const getPlatformIcon = (platform: string) => {
+  const getPlatformIcon = (platform) => {
     switch (platform) {
       case "instagram":
         return <Instagram className="w-4 h-4" />;
@@ -598,7 +561,7 @@ const LinksTable = () => {
     })
   );
 
-  const handleProductDragEnd = (event: DragEndEvent) => {
+  const handleProductDragEnd = (event) => {
     const { active, over } = event;
     
     if (over && active.id !== over.id) {
@@ -611,7 +574,7 @@ const LinksTable = () => {
     }
   };
 
-  const handleCampaignDragEnd = (event: DragEndEvent, productId: string) => {
+  const handleCampaignDragEnd = (event, productId) => {
     const { active, over } = event;
     
     if (over && active.id !== over.id) {
@@ -769,7 +732,7 @@ const LinksTable = () => {
                                     <select
                                       id="platform"
                                       value={newCampaign.platform}
-                                      onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, platform: e.target.value as any})}
+                                      onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, platform: e.target.value})}
                                       className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     >
                                       <option value="instagram">Instagram</option>
