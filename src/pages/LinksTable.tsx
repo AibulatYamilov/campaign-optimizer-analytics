@@ -642,7 +642,7 @@ const LinksTable = () => {
             <div className="flex items-center gap-5">
               <div className="flex items-center gap-2 bg-primary/10 px-3 py-1.5 rounded-full text-primary">
                 <Link2 className="w-4 h-4" />
-                <span className="text-sm font-medium">{userInfo.linksGenerated}/{userInfo.linksLimit}</span>
+                <span className="text-sm font-medium">Ссылок сгенерировано в этом месяце: {userInfo.linksGenerated}/{userInfo.linksLimit}</span>
               </div>
               <div className="flex items-center gap-2 text-gray-700">
                 <User className="w-4 h-4" />
