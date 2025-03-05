@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -17,7 +18,8 @@ import {
   Copy,
   Pencil,
   GripVertical,
-  Check
+  Check,
+  User
 } from "lucide-react";
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
 import { toast } from "sonner";
@@ -387,6 +389,13 @@ const LinksTable = () => {
   const [isAddCampaignDialogOpen, setIsAddCampaignDialogOpen] = useState(false);
   const [isGeneratedLinkDialogOpen, setIsGeneratedLinkDialogOpen] = useState(false);
   const [generatedLink, setGeneratedLink] = useState("");
+  
+  // User info mock data - in a real app, this would come from authentication system
+  const userInfo = {
+    username: "MarketingSeller",
+    linksGenerated: 5,
+    linksLimit: 10
+  };
 
   const toggleCollapsible = (id: string) => {
     if (openCollapsible === id) {
@@ -442,7 +451,8 @@ const LinksTable = () => {
 
         return {
           ...product,
-          campaigns: [...product.campaigns, newCampaignObj]
+          // Add the new campaign to the beginning of the array instead of the end
+          campaigns: [newCampaignObj, ...product.campaigns]
         };
       }
       return product;
@@ -626,6 +636,18 @@ const LinksTable = () => {
                 <Home className="w-5 h-5 text-primary" />
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">CampaignOptimizer</span>
               </Link>
+            </div>
+            
+            {/* User information section */}
+            <div className="flex items-center gap-5">
+              <div className="flex items-center gap-2 bg-primary/10 px-3 py-1.5 rounded-full text-primary">
+                <Link2 className="w-4 h-4" />
+                <span className="text-sm font-medium">{userInfo.linksGenerated}/{userInfo.linksLimit}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-700">
+                <User className="w-4 h-4" />
+                <span className="text-sm font-medium">{userInfo.username}</span>
+              </div>
             </div>
           </div>
         </div>
