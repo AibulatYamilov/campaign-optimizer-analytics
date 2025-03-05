@@ -3,26 +3,42 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Home, Mail, Key, LogIn } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [codeSent, setCodeSent] = useState(false);
+  const [showNotRegisteredDialog, setShowNotRegisteredDialog] = useState(false);
   const navigate = useNavigate();
 
   const handleSendCode = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Имитация отправки кода
+    // Симуляция проверки существования email (в реальном приложении это будет API запрос)
     setTimeout(() => {
-      setLoading(false);
-      setCodeSent(true);
-      toast({
-        title: "Код отправлен",
-        description: `Код подтверждения отправлен на ${email}`,
-      });
+      // Для демонстрации используем email test@example.com как "незарегистрированный"
+      if (email === "test@example.com") {
+        setLoading(false);
+        setShowNotRegisteredDialog(true);
+      } else {
+        // Имитация отправки кода
+        setLoading(false);
+        setCodeSent(true);
+        toast({
+          title: "Код отправлен",
+          description: `Код подтверждения отправлен на ${email}`,
+        });
+      }
     }, 1500);
   };
 
@@ -40,6 +56,10 @@ const Login = () => {
       // Перенаправление на страницу с ссылками
       navigate("/links");
     }, 1500);
+  };
+
+  const handleCloseDialog = () => {
+    setShowNotRegisteredDialog(false);
   };
 
   return (
@@ -189,6 +209,32 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* Dialog for unregistered email */}
+      <Dialog open={showNotRegisteredDialog} onOpenChange={setShowNotRegisteredDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Аккаунт не найден</DialogTitle>
+            <DialogDescription>
+              Пользователь с email {email} не зарегистрирован в системе.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:justify-between">
+            <button
+              onClick={handleCloseDialog}
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground px-4 py-2"
+            >
+              Попробовать другой email
+            </button>
+            <Link
+              to="/register"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2"
+            >
+              Зарегистрироваться
+            </Link>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
