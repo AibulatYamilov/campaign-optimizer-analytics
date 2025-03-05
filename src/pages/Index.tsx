@@ -2,6 +2,7 @@
 import { ChartBar, Users, DollarSign, Target, Rocket } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import Logo from "@/components/Logo";
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -16,7 +17,7 @@ const Index = () => {
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg z-50 border-b border-gray-100">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="font-display text-xl font-bold">CampaignOptimizer</div>
+            <Logo />
             <div className="flex items-center gap-6">
               <Link to="/links" className="text-gray-600 hover:text-primary transition-colors">
                 Links Table
@@ -140,7 +141,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-gray-100 py-12">
         <div className="container mx-auto px-6 text-center text-gray-600">
-          <p>&copy; 2024 CampaignOptimizer. All rights reserved.</p>
+          <p>&copy; 2024 ВнешкаПРО. All rights reserved.</p>
         </div>
       </footer>
     </div>

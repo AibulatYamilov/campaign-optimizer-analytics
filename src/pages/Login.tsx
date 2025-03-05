@@ -1,8 +1,8 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Home, Mail, Key, LogIn } from "lucide-react";
+import { Mail, Key, LogIn } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import Logo from "@/components/Logo";
 import {
   Dialog,
   DialogContent,
@@ -68,12 +68,7 @@ const Login = () => {
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg z-50 border-b border-gray-100">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link to="/" className="font-display text-xl font-bold flex items-center gap-2">
-                <Home className="w-5 h-5" />
-                CampaignOptimizer
-              </Link>
-            </div>
+            <Logo />
             <div className="flex items-center gap-4">
               <Link 
                 to="/links" 
