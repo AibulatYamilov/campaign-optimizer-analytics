@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -389,8 +388,8 @@ const LinksTable = () => {
   const [isAddCampaignDialogOpen, setIsAddCampaignDialogOpen] = useState(false);
   const [isGeneratedLinkDialogOpen, setIsGeneratedLinkDialogOpen] = useState(false);
   const [generatedLink, setGeneratedLink] = useState("");
+  const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
   
-  // User info mock data - in a real app, this would come from authentication system
   const userInfo = {
     username: "MarketingSeller",
     linksGenerated: 5,
@@ -431,6 +430,12 @@ const LinksTable = () => {
       return;
     }
 
+    if (userInfo.linksGenerated >= userInfo.linksLimit) {
+      setIsAddCampaignDialogOpen(false);
+      setIsLimitExceededDialogOpen(true);
+      return;
+    }
+
     const generatedDeeplink = `https://vneshka.pro/toplink/${generateRandomString()}`;
 
     const updatedProducts = products.map(product => {
@@ -451,7 +456,6 @@ const LinksTable = () => {
 
         return {
           ...product,
-          // Add the new campaign to the beginning of the array instead of the end
           campaigns: [newCampaignObj, ...product.campaigns]
         };
       }
@@ -460,6 +464,8 @@ const LinksTable = () => {
 
     setProducts(updatedProducts);
     setGeneratedLink(generatedDeeplink);
+    userInfo.linksGenerated += 1;
+    
     setNewCampaign({
       productId: "",
       platform: "instagram",
@@ -638,7 +644,6 @@ const LinksTable = () => {
               </Link>
             </div>
             
-            {/* User information section */}
             <div className="flex items-center gap-5">
               <div className="flex items-center gap-2 bg-primary/10 px-3 py-1.5 rounded-full text-primary">
                 <Link2 className="w-4 h-4" />
@@ -921,6 +926,30 @@ const LinksTable = () => {
               >
                 <Check className="w-4 h-4" />
                 Готово
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog 
+        open={isLimitExceededDialogOpen} 
+        onOpenChange={setIsLimitExceededDialogOpen}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-display text-red-600">Лимит превышен</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-700">
+              К сожалению, вы превысили лимит в этом месяце.
+            </p>
+            <div className="mt-6 flex justify-end">
+              <button 
+                onClick={() => setIsLimitExceededDialogOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+              >
+                Закрыть
               </button>
             </div>
           </div>
