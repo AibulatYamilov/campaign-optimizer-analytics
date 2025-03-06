@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -18,8 +19,7 @@ import {
   Pencil,
   GripVertical,
   Check,
-  User,
-  RefreshCw
+  User
 } from "lucide-react";
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
 import { toast } from "sonner";
@@ -352,7 +352,6 @@ const LinksTable = () => {
   const [isGeneratedLinkDialogOpen, setIsGeneratedLinkDialogOpen] = useState(false);
   const [generatedLink, setGeneratedLink] = useState("");
   const [isLimitExceededDialogOpen, setIsLimitExceededDialogOpen] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   
   const userInfo = {
     username: "MarketingSeller",
@@ -596,37 +595,6 @@ const LinksTable = () => {
     }
   };
 
-  const refreshCampaignStats = (productId) => {
-    setIsRefreshing(true);
-    
-    setTimeout(() => {
-      const updatedProducts = products.map(product => {
-        if (product.id === productId) {
-          return {
-            ...product,
-            campaigns: product.campaigns.map(campaign => {
-              const totalIncrement = Math.floor(Math.random() * 50) + 1;
-              const weekIncrement = Math.floor(Math.random() * 20) + 1;
-              const dayIncrement = Math.floor(Math.random() * 5) + 1;
-              
-              return {
-                ...campaign,
-                totalViews: campaign.totalViews + totalIncrement,
-                last7DaysViews: campaign.last7DaysViews + weekIncrement,
-                lastDayViews: campaign.lastDayViews + dayIncrement
-              };
-            })
-          };
-        }
-        return product;
-      });
-      
-      setProducts(updatedProducts);
-      setIsRefreshing(false);
-      toast.success("Статистика успешно обновлена");
-    }, 1000);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-xl z-50 border-b border-gray-100 shadow-sm">
@@ -843,44 +811,26 @@ const LinksTable = () => {
                             <p className="text-gray-500">У этого товара пока нет рекламных кампаний</p>
                           </div>
                         ) : (
-                          <div className="bg-white rounded-xl border border-gray-200 shadow-md overflow-hidden">
-                            <div className="flex justify-between items-center p-4 border-b border-gray-100">
-                              <div className="flex items-center gap-2">
-                                <h4 className="font-semibold text-gray-700">Статистика переходов</h4>
-                                <button 
-                                  onClick={() => refreshCampaignStats(product.id)}
-                                  className={`p-1.5 rounded-full bg-gray-100 text-gray-500 hover:bg-primary/10 hover:text-primary transition-colors ${isRefreshing ? 'animate-spin' : ''}`}
-                                  disabled={isRefreshing}
-                                  title="Обновить статистику"
+                          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-md">
+                            <Table>
+                              <TableHeader>
+                                <TableRow className="bg-gray-50">
+                                  <TableHead className="w-[5%]"></TableHead>
+                                  <TableHead className="w-[30%]">Рекламная кампания</TableHead>
+                                  <TableHead className="w-[20%]">Ссылка для рекламной кампании</TableHead>
+                                  <TableHead className="w-[45%]">Статистика переходов</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                <DndContext 
+                                  sensors={sensors}
+                                  collisionDetection={closestCenter}
+                                  onDragEnd={(event) => handleCampaignDragEnd(event, product.id)}
                                 >
-                                  <RefreshCw className="w-4 h-4" />
-                                </button>
-                              </div>
-                              
-                              <p className="text-sm text-gray-500">
-                                Всего кампаний: {product.campaigns.length}
-                              </p>
-                            </div>
-
-                            <DndContext
-                              sensors={sensors} 
-                              collisionDetection={closestCenter}
-                              onDragEnd={(event) => handleCampaignDragEnd(event, product.id)}
-                            >
-                              <SortableContext
-                                items={product.campaigns.map(campaign => campaign.id)}
-                                strategy={verticalListSortingStrategy}
-                              >
-                                <Table>
-                                  <TableHeader>
-                                    <TableRow>
-                                      <TableHead className="w-[5%]"></TableHead>
-                                      <TableHead>Кампания</TableHead>
-                                      <TableHead>Реферальная ссылка</TableHead>
-                                      <TableHead>Статистика</TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody>
+                                  <SortableContext 
+                                    items={product.campaigns.map(campaign => campaign.id)}
+                                    strategy={verticalListSortingStrategy}
+                                  >
                                     {product.campaigns.map((campaign) => (
                                       <SortableCampaignRow 
                                         key={campaign.id} 
@@ -889,10 +839,10 @@ const LinksTable = () => {
                                         onUpdatePostLink={updateCampaignPostLink}
                                       />
                                     ))}
-                                  </TableBody>
-                                </Table>
-                              </SortableContext>
-                            </DndContext>
+                                  </SortableContext>
+                                </DndContext>
+                              </TableBody>
+                            </Table>
                           </div>
                         )}
                       </div>
@@ -905,48 +855,66 @@ const LinksTable = () => {
         </div>
       </div>
 
-      <Dialog open={isGeneratedLinkDialogOpen} onOpenChange={setIsGeneratedLinkDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+      <Dialog 
+        open={isGeneratedLinkDialogOpen} 
+        onOpenChange={setIsGeneratedLinkDialogOpen}
+      >
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="text-xl font-display">Реферальная ссылка создана</DialogTitle>
+            <DialogTitle className="text-xl font-display">Ссылка для кампании создана</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <div className="bg-gray-50 p-3 rounded-lg flex items-center justify-between">
-              <span className="text-sm text-gray-600 truncate mr-2">{generatedLink}</span>
+            <p className="text-gray-700 mb-4">
+              Сгенерировали ссылку для этой рекламной кампании. 
+              Попросите рекламодателя указать эту ссылку в рекламном посте.
+            </p>
+            <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+              <div className="flex-1 font-mono text-sm text-gray-700 break-all">
+                {generatedLink}
+              </div>
               <button 
-                onClick={() => copyToClipboard(generatedLink)}
-                className="p-1.5 text-gray-500 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+                onClick={() => {
+                  copyToClipboard(generatedLink);
+                }}
+                className="p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                title="Скопировать ссылку"
               >
                 <Copy className="w-4 h-4" />
               </button>
             </div>
-            <p className="text-sm text-gray-500 mt-4">
-              Используйте эту ссылку для отслеживания трафика с рекламной кампании
-            </p>
+            <div className="mt-4 flex justify-end">
+              <button 
+                onClick={() => setIsGeneratedLinkDialogOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg"
+              >
+                <Check className="w-4 h-4" />
+                Готово
+              </button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isLimitExceededDialogOpen} onOpenChange={setIsLimitExceededDialogOpen}>
+      <Dialog 
+        open={isLimitExceededDialogOpen} 
+        onOpenChange={setIsLimitExceededDialogOpen}
+      >
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle className="text-xl font-display text-red-500">Достигнут лимит ссылок</DialogTitle>
+            <DialogTitle className="text-xl font-display text-red-600">Лимит превышен</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <p className="text-gray-700">
-              Вы достигли лимита в {userInfo.linksLimit} реферальных ссылок в текущем месяце.
+              К сожалению, вы превысили лимит в этом месяце.
             </p>
-            <p className="text-gray-500 mt-2">
-              Для увеличения лимита перейдите на тарифный план PRO
-            </p>
-          </div>
-          <div className="flex gap-4">
-            <button className="flex-1 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 font-medium py-2.5 rounded-lg">
-              Остаться на текущем плане
-            </button>
-            <button className="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary transition-colors text-white font-medium py-2.5 rounded-lg shadow-md">
-              Перейти на PRO
-            </button>
+            <div className="mt-6 flex justify-end">
+              <button 
+                onClick={() => setIsLimitExceededDialogOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+              >
+                Закрыть
+              </button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
