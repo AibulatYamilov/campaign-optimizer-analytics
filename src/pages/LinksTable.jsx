@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -19,7 +18,8 @@ import {
   Pencil,
   GripVertical,
   Check,
-  User
+  User,
+  RefreshCw
 } from "lucide-react";
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
 import { toast } from "sonner";
@@ -108,7 +108,7 @@ const SortableProductItem = ({ product, isOpen, onToggle }) => {
   );
 };
 
-const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }) => {
+const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink, onRefreshStats }) => {
   const { 
     attributes, 
     listeners, 
@@ -119,6 +119,7 @@ const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }) => {
 
   const [isEditingPostLink, setIsEditingPostLink] = useState(false);
   const [postLinkValue, setPostLinkValue] = useState(campaign.postLink || "");
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -150,6 +151,14 @@ const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }) => {
   const handleSavePostLink = () => {
     onUpdatePostLink(productId, campaign.id, postLinkValue);
     setIsEditingPostLink(false);
+  };
+
+  const handleRefreshStats = () => {
+    setIsRefreshing(true);
+    onRefreshStats(productId, campaign.id);
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
   };
 
   return (
@@ -253,28 +262,38 @@ const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }) => {
         </div>
       </TableCell>
       <TableCell>
-        <div className="grid grid-cols-3 gap-2">
-          <div className="bg-gray-50 p-2 rounded-lg">
-            <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-              <Eye className="w-3 h-3" />
-              Всего
+        <div className="flex justify-between items-center">
+          <div className="grid grid-cols-3 gap-2">
+            <div className="bg-gray-50 p-2 rounded-lg">
+              <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                <Eye className="w-3 h-3" />
+                Всего
+              </div>
+              <div className="font-semibold">{campaign.totalViews.toLocaleString()}</div>
             </div>
-            <div className="font-semibold">{campaign.totalViews.toLocaleString()}</div>
-          </div>
-          <div className="bg-gray-50 p-2 rounded-lg">
-            <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-              <BarChart className="w-3 h-3" />
-              7 дней
+            <div className="bg-gray-50 p-2 rounded-lg">
+              <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                <BarChart className="w-3 h-3" />
+                7 дней
+              </div>
+              <div className="font-semibold">{campaign.last7DaysViews.toLocaleString()}</div>
             </div>
-            <div className="font-semibold">{campaign.last7DaysViews.toLocaleString()}</div>
-          </div>
-          <div className="bg-gray-50 p-2 rounded-lg">
-            <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              24 часа
+            <div className="bg-gray-50 p-2 rounded-lg">
+              <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                24 часа
+              </div>
+              <div className="font-semibold">{campaign.lastDayViews.toLocaleString()}</div>
             </div>
-            <div className="font-semibold">{campaign.lastDayViews.toLocaleString()}</div>
           </div>
+          <button
+            onClick={handleRefreshStats}
+            disabled={isRefreshing}
+            className={`ml-2 p-2 rounded-full ${isRefreshing ? 'bg-primary/5' : 'hover:bg-primary/10'} text-primary transition-colors`}
+            title="Обновить статистику"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          </button>
         </div>
       </TableCell>
     </TableRow>
@@ -467,6 +486,39 @@ const LinksTable = () => {
     
     setProducts(updatedProducts);
     toast.success("Ссылка на пост добавлена");
+  };
+
+  const refreshCampaignStats = (productId, campaignId) => {
+    const generateRandomIncrement = (max) => Math.floor(Math.random() * max) + 1;
+    
+    const updatedProducts = products.map(product => {
+      if (product.id === productId) {
+        const updatedCampaigns = product.campaigns.map(campaign => {
+          if (campaign.id === campaignId) {
+            const totalViewsIncrement = generateRandomIncrement(50);
+            const last7DaysViewsIncrement = generateRandomIncrement(30);
+            const lastDayViewsIncrement = generateRandomIncrement(10);
+            
+            return {
+              ...campaign,
+              totalViews: campaign.totalViews + totalViewsIncrement,
+              last7DaysViews: campaign.last7DaysViews + last7DaysViewsIncrement,
+              lastDayViews: campaign.lastDayViews + lastDayViewsIncrement
+            };
+          }
+          return campaign;
+        });
+        
+        return {
+          ...product,
+          campaigns: updatedCampaigns
+        };
+      }
+      return product;
+    });
+    
+    setProducts(updatedProducts);
+    toast.success("Статистика обновлена");
   };
 
   const moveProduct = (index, direction) => {
@@ -837,6 +889,7 @@ const LinksTable = () => {
                                         campaign={campaign} 
                                         productId={product.id}
                                         onUpdatePostLink={updateCampaignPostLink}
+                                        onRefreshStats={refreshCampaignStats}
                                       />
                                     ))}
                                   </SortableContext>
@@ -879,7 +932,7 @@ const LinksTable = () => {
                 className="p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                 title="Скопировать ссылку"
               >
-                <Copy className="w-4 h-4" />
+                <Copy className="w-3.5 h-3.5" />
               </button>
             </div>
             <div className="mt-4 flex justify-end">
