@@ -1,4 +1,3 @@
-<lov-code>
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -843,4 +842,80 @@ const LinksTable = () => {
 
                         {product.campaigns.length === 0 ? (
                           <div className="text-center py-8 bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
-                            <p className="text-gray-500">У этого товара пока нет рекламных кампаний</
+                            <p className="text-gray-500">У этого товара пока нет рекламных кампаний</p>
+                          </div>
+                        ) : (
+                          <div className="bg-white rounded-xl border border-gray-200 shadow-md overflow-hidden">
+                            <div className="flex justify-between items-center p-4 border-b border-gray-100">
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-semibold text-gray-700">Статистика переходов</h4>
+                                <button 
+                                  onClick={() => refreshCampaignStats(product.id)}
+                                  className={`p-1.5 rounded-full bg-gray-100 text-gray-500 hover:bg-primary/10 hover:text-primary transition-colors ${isRefreshing ? 'animate-spin' : ''}`}
+                                  disabled={isRefreshing}
+                                  title="Обновить статистику"
+                                >
+                                  <RefreshCw className="w-4 h-4" />
+                                </button>
+                              </div>
+                              
+                              <p className="text-sm text-gray-500">
+                                Всего кампаний: {product.campaigns.length}
+                              </p>
+                            </div>
+
+                            <DndContext
+                              sensors={sensors} 
+                              collisionDetection={closestCenter}
+                              onDragEnd={(event) => handleCampaignDragEnd(event, product.id)}
+                            >
+                              <SortableContext
+                                items={product.campaigns.map(campaign => campaign.id)}
+                                strategy={verticalListSortingStrategy}
+                              >
+                                <Table>
+                                  <TableHeader>
+                                    <TableRow>
+                                      <TableHead className="w-[5%]"></TableHead>
+                                      <TableHead>Кампания</TableHead>
+                                      <TableHead>Реферальная ссылка</TableHead>
+                                      <TableHead>Статистика</TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody>
+                                    {product.campaigns.map((campaign) => (
+                                      <SortableCampaignRow 
+                                        key={campaign.id} 
+                                        campaign={campaign} 
+                                        productId={product.id}
+                                        onUpdatePostLink={updateCampaignPostLink}
+                                      />
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </SortableContext>
+                            </DndContext>
+                          </div>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                ))}
+              </SortableContext>
+            </DndContext>
+          )}
+        </div>
+      </div>
+
+      <Dialog open={isGeneratedLinkDialogOpen} onOpenChange={setIsGeneratedLinkDialogOpen}>
+        {/* ... keep existing code (generated link dialog) */}
+      </Dialog>
+
+      <Dialog open={isLimitExceededDialogOpen} onOpenChange={setIsLimitExceededDialogOpen}>
+        {/* ... keep existing code (limit exceeded dialog) */}
+      </Dialog>
+    </div>
+  );
+};
+
+export default LinksTable;
