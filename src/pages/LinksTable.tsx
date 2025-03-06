@@ -18,7 +18,8 @@ import {
   Pencil,
   GripVertical,
   Check,
-  User
+  User,
+  RefreshCw
 } from "lucide-react";
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
 import { toast } from "sonner";
@@ -134,10 +135,11 @@ const SortableProductItem = ({ product, isOpen, onToggle }: {
   );
 };
 
-const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }: { 
+const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink, onRefreshStats }: { 
   campaign: Campaign; 
   productId: string;
   onUpdatePostLink: (productId: string, campaignId: string, postLink: string) => void;
+  onRefreshStats: (productId: string, campaignId: string) => void;
 }) => {
   const { 
     attributes, 
@@ -149,10 +151,19 @@ const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }: {
 
   const [isEditingPostLink, setIsEditingPostLink] = useState(false);
   const [postLinkValue, setPostLinkValue] = useState(campaign.postLink || "");
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+  };
+
+  const handleRefreshStats = () => {
+    setIsRefreshing(true);
+    onRefreshStats(productId, campaign.id);
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 800);
   };
 
   const getPlatformIcon = (platform: string) => {
@@ -283,28 +294,38 @@ const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }: {
         </div>
       </TableCell>
       <TableCell>
-        <div className="grid grid-cols-3 gap-2">
-          <div className="bg-gray-50 p-2 rounded-lg">
-            <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-              <Eye className="w-3 h-3" />
-              Всего
+        <div className="flex items-center justify-between">
+          <div className="grid grid-cols-3 gap-2">
+            <div className="bg-gray-50 p-2 rounded-lg">
+              <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                <Eye className="w-3 h-3" />
+                Всего
+              </div>
+              <div className="font-semibold">{campaign.totalViews.toLocaleString()}</div>
             </div>
-            <div className="font-semibold">{campaign.totalViews.toLocaleString()}</div>
-          </div>
-          <div className="bg-gray-50 p-2 rounded-lg">
-            <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-              <BarChart className="w-3 h-3" />
-              7 дней
+            <div className="bg-gray-50 p-2 rounded-lg">
+              <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                <BarChart className="w-3 h-3" />
+                7 дней
+              </div>
+              <div className="font-semibold">{campaign.last7DaysViews.toLocaleString()}</div>
             </div>
-            <div className="font-semibold">{campaign.last7DaysViews.toLocaleString()}</div>
-          </div>
-          <div className="bg-gray-50 p-2 rounded-lg">
-            <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              24 часа
+            <div className="bg-gray-50 p-2 rounded-lg">
+              <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                24 часа
+              </div>
+              <div className="font-semibold">{campaign.lastDayViews.toLocaleString()}</div>
             </div>
-            <div className="font-semibold">{campaign.lastDayViews.toLocaleString()}</div>
           </div>
+          <button 
+            onClick={handleRefreshStats}
+            disabled={isRefreshing}
+            className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-primary transition-colors"
+            title="Обновить статистику"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          </button>
         </div>
       </TableCell>
     </TableRow>
@@ -504,6 +525,37 @@ const LinksTable = () => {
     
     setProducts(updatedProducts);
     toast.success("Ссылка на пост добавлена");
+  };
+
+  const refreshCampaignStats = (productId: string, campaignId: string) => {
+    const totalIncrement = Math.floor(Math.random() * 50) + 10;
+    const last7DaysIncrement = Math.floor(Math.random() * 20) + 5;
+    const lastDayIncrement = Math.floor(Math.random() * 10) + 1;
+
+    const updatedProducts = products.map(product => {
+      if (product.id === productId) {
+        const updatedCampaigns = product.campaigns.map(campaign => {
+          if (campaign.id === campaignId) {
+            return {
+              ...campaign,
+              totalViews: campaign.totalViews + totalIncrement,
+              last7DaysViews: campaign.last7DaysViews + last7DaysIncrement,
+              lastDayViews: campaign.lastDayViews + lastDayIncrement
+            };
+          }
+          return campaign;
+        });
+        
+        return {
+          ...product,
+          campaigns: updatedCampaigns
+        };
+      }
+      return product;
+    });
+    
+    setProducts(updatedProducts);
+    toast.success("Статистика успешно обновлена");
   };
 
   const moveProduct = (index: number, direction: "up" | "down") => {
@@ -874,6 +926,7 @@ const LinksTable = () => {
                                         campaign={campaign} 
                                         productId={product.id}
                                         onUpdatePostLink={updateCampaignPostLink}
+                                        onRefreshStats={refreshCampaignStats}
                                       />
                                     ))}
                                   </SortableContext>
