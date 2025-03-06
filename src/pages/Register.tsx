@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, User, CheckCircle, AlertCircle } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
-import Logo from "@/components/Logo.jsx";
+import Logo from "@/components/Logo";
 import { 
   Dialog, 
   DialogContent, 
@@ -20,7 +19,7 @@ const Register = () => {
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 

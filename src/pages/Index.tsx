@@ -2,7 +2,7 @@
 import { ChartBar, Users, DollarSign, Target, Rocket } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Logo from "@/components/Logo.jsx";
+import Logo from "@/components/Logo";
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);

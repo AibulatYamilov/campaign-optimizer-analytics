@@ -18,8 +18,7 @@ import {
   Pencil,
   GripVertical,
   Check,
-  User,
-  RefreshCw
+  User
 } from "lucide-react";
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
 import { toast } from "sonner";
@@ -33,6 +32,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  DragEndEvent
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -47,7 +47,33 @@ const Collapsible = CollapsiblePrimitive.Root;
 const CollapsibleTrigger = CollapsiblePrimitive.CollapsibleTrigger;
 const CollapsibleContent = CollapsiblePrimitive.CollapsibleContent;
 
-const SortableProductItem = ({ product, isOpen, onToggle }) => {
+interface Campaign {
+  id: string;
+  platform: "instagram" | "tiktok" | "youtube" | "telegram" | "vk" | "other";
+  advertiser: string;
+  advertiserLink?: string;
+  startDate?: Date;
+  cost?: number;
+  postLink?: string;
+  deeplink: string;
+  totalViews: number;
+  last7DaysViews: number;
+  lastDayViews: number;
+  durationDays: number;
+}
+
+interface Product {
+  id: string;
+  title: string;
+  url: string;
+  campaigns: Campaign[];
+}
+
+const SortableProductItem = ({ product, isOpen, onToggle }: { 
+  product: Product; 
+  isOpen: boolean; 
+  onToggle: () => void; 
+}) => {
   const { 
     attributes, 
     listeners, 
@@ -108,7 +134,11 @@ const SortableProductItem = ({ product, isOpen, onToggle }) => {
   );
 };
 
-const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink, onRefreshStats }) => {
+const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink }: { 
+  campaign: Campaign; 
+  productId: string;
+  onUpdatePostLink: (productId: string, campaignId: string, postLink: string) => void;
+}) => {
   const { 
     attributes, 
     listeners, 
@@ -119,14 +149,13 @@ const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink, onRefreshS
 
   const [isEditingPostLink, setIsEditingPostLink] = useState(false);
   const [postLinkValue, setPostLinkValue] = useState(campaign.postLink || "");
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
 
-  const getPlatformIcon = (platform) => {
+  const getPlatformIcon = (platform: string) => {
     switch (platform) {
       case "instagram":
         return <Instagram className="w-4 h-4" />;
@@ -143,7 +172,7 @@ const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink, onRefreshS
     }
   };
 
-  const copyToClipboard = (text) => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Скопировано в буфер обмена");
   };
@@ -151,14 +180,6 @@ const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink, onRefreshS
   const handleSavePostLink = () => {
     onUpdatePostLink(productId, campaign.id, postLinkValue);
     setIsEditingPostLink(false);
-  };
-
-  const handleRefreshStats = () => {
-    setIsRefreshing(true);
-    onRefreshStats(productId, campaign.id);
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 1000);
   };
 
   return (
@@ -262,38 +283,28 @@ const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink, onRefreshS
         </div>
       </TableCell>
       <TableCell>
-        <div className="flex justify-between items-center">
-          <div className="grid grid-cols-3 gap-2">
-            <div className="bg-gray-50 p-2 rounded-lg">
-              <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-                <Eye className="w-3 h-3" />
-                Всего
-              </div>
-              <div className="font-semibold">{campaign.totalViews.toLocaleString()}</div>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="bg-gray-50 p-2 rounded-lg">
+            <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+              <Eye className="w-3 h-3" />
+              Всего
             </div>
-            <div className="bg-gray-50 p-2 rounded-lg">
-              <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-                <BarChart className="w-3 h-3" />
-                7 дней
-              </div>
-              <div className="font-semibold">{campaign.last7DaysViews.toLocaleString()}</div>
-            </div>
-            <div className="bg-gray-50 p-2 rounded-lg">
-              <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                24 часа
-              </div>
-              <div className="font-semibold">{campaign.lastDayViews.toLocaleString()}</div>
-            </div>
+            <div className="font-semibold">{campaign.totalViews.toLocaleString()}</div>
           </div>
-          <button
-            onClick={handleRefreshStats}
-            disabled={isRefreshing}
-            className={`ml-2 p-2 rounded-full ${isRefreshing ? 'bg-primary/5' : 'hover:bg-primary/10'} text-primary transition-colors`}
-            title="Обновить статистику"
-          >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          </button>
+          <div className="bg-gray-50 p-2 rounded-lg">
+            <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+              <BarChart className="w-3 h-3" />
+              7 дней
+            </div>
+            <div className="font-semibold">{campaign.last7DaysViews.toLocaleString()}</div>
+          </div>
+          <div className="bg-gray-50 p-2 rounded-lg">
+            <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              24 часа
+            </div>
+            <div className="font-semibold">{campaign.lastDayViews.toLocaleString()}</div>
+          </div>
         </div>
       </TableCell>
     </TableRow>
@@ -301,7 +312,7 @@ const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink, onRefreshS
 };
 
 const LinksTable = () => {
-  const [products, setProducts] = useState([
+  const [products, setProducts] = useState<Product[]>([
     {
       id: "1",
       title: "Бусы из натуральных камней Горный Хрусталь",
@@ -355,9 +366,16 @@ const LinksTable = () => {
     }
   ]);
 
-  const [openCollapsible, setOpenCollapsible] = useState(null);
+  const [openCollapsible, setOpenCollapsible] = useState<string | null>(null);
   const [newProduct, setNewProduct] = useState({ title: "", url: "" });
-  const [newCampaign, setNewCampaign] = useState({
+  const [newCampaign, setNewCampaign] = useState<{
+    productId: string;
+    platform: "instagram" | "tiktok" | "youtube" | "telegram" | "vk" | "other";
+    advertiser: string;
+    advertiserLink: string;
+    startDate: string;
+    cost: string;
+  }>({
     productId: "",
     platform: "instagram",
     advertiser: "",
@@ -378,7 +396,7 @@ const LinksTable = () => {
     linksLimit: 10
   };
 
-  const toggleCollapsible = (id) => {
+  const toggleCollapsible = (id: string) => {
     if (openCollapsible === id) {
       setOpenCollapsible(null);
     } else {
@@ -392,7 +410,7 @@ const LinksTable = () => {
       return;
     }
 
-    const newProductObj = {
+    const newProductObj: Product = {
       id: Date.now().toString(),
       title: newProduct.title,
       url: newProduct.url,
@@ -422,7 +440,7 @@ const LinksTable = () => {
 
     const updatedProducts = products.map(product => {
       if (product.id === newCampaign.productId) {
-        const newCampaignObj = {
+        const newCampaignObj: Campaign = {
           id: `${product.id}-${product.campaigns.length + 1}`,
           platform: newCampaign.platform,
           advertiser: newCampaign.advertiser,
@@ -463,7 +481,7 @@ const LinksTable = () => {
     toast.success("Кампания успешно добавлена");
   };
 
-  const updateCampaignPostLink = (productId, campaignId, postLink) => {
+  const updateCampaignPostLink = (productId: string, campaignId: string, postLink: string) => {
     const updatedProducts = products.map(product => {
       if (product.id === productId) {
         const updatedCampaigns = product.campaigns.map(campaign => {
@@ -488,40 +506,7 @@ const LinksTable = () => {
     toast.success("Ссылка на пост добавлена");
   };
 
-  const refreshCampaignStats = (productId, campaignId) => {
-    const generateRandomIncrement = (max) => Math.floor(Math.random() * max) + 1;
-    
-    const updatedProducts = products.map(product => {
-      if (product.id === productId) {
-        const updatedCampaigns = product.campaigns.map(campaign => {
-          if (campaign.id === campaignId) {
-            const totalViewsIncrement = generateRandomIncrement(50);
-            const last7DaysViewsIncrement = generateRandomIncrement(30);
-            const lastDayViewsIncrement = generateRandomIncrement(10);
-            
-            return {
-              ...campaign,
-              totalViews: campaign.totalViews + totalViewsIncrement,
-              last7DaysViews: campaign.last7DaysViews + last7DaysViewsIncrement,
-              lastDayViews: campaign.lastDayViews + lastDayViewsIncrement
-            };
-          }
-          return campaign;
-        });
-        
-        return {
-          ...product,
-          campaigns: updatedCampaigns
-        };
-      }
-      return product;
-    });
-    
-    setProducts(updatedProducts);
-    toast.success("Статистика обновлена");
-  };
-
-  const moveProduct = (index, direction) => {
+  const moveProduct = (index: number, direction: "up" | "down") => {
     if ((direction === "up" && index === 0) || 
         (direction === "down" && index === products.length - 1)) {
       return;
@@ -533,7 +518,7 @@ const LinksTable = () => {
     setProducts(newProducts);
   };
 
-  const moveCampaign = (productId, campaignIndex, direction) => {
+  const moveCampaign = (productId: string, campaignIndex: number, direction: "up" | "down") => {
     const productIndex = products.findIndex(p => p.id === productId);
     if (productIndex === -1) return;
 
@@ -555,7 +540,7 @@ const LinksTable = () => {
     setProducts(updatedProducts);
   };
 
-  const copyToClipboard = (text) => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Скопировано в буфер обмена");
   };
@@ -565,12 +550,12 @@ const LinksTable = () => {
            Math.random().toString(36).substring(2, 15);
   };
 
-  const deleteProduct = (productId) => {
+  const deleteProduct = (productId: string) => {
     setProducts(products.filter(p => p.id !== productId));
     toast.success("Товар удален");
   };
 
-  const deleteCampaign = (productId, campaignId) => {
+  const deleteCampaign = (productId: string, campaignId: string) => {
     const updatedProducts = products.map(product => {
       if (product.id === productId) {
         return {
@@ -585,7 +570,7 @@ const LinksTable = () => {
     toast.success("Кампания удалена");
   };
 
-  const getPlatformIcon = (platform) => {
+  const getPlatformIcon = (platform: string) => {
     switch (platform) {
       case "instagram":
         return <Instagram className="w-4 h-4" />;
@@ -613,7 +598,7 @@ const LinksTable = () => {
     })
   );
 
-  const handleProductDragEnd = (event) => {
+  const handleProductDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     
     if (over && active.id !== over.id) {
@@ -626,7 +611,7 @@ const LinksTable = () => {
     }
   };
 
-  const handleCampaignDragEnd = (event, productId) => {
+  const handleCampaignDragEnd = (event: DragEndEvent, productId: string) => {
     const { active, over } = event;
     
     if (over && active.id !== over.id) {
@@ -784,7 +769,7 @@ const LinksTable = () => {
                                     <select
                                       id="platform"
                                       value={newCampaign.platform}
-                                      onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, platform: e.target.value})}
+                                      onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, platform: e.target.value as any})}
                                       className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     >
                                       <option value="instagram">Instagram</option>
@@ -889,7 +874,6 @@ const LinksTable = () => {
                                         campaign={campaign} 
                                         productId={product.id}
                                         onUpdatePostLink={updateCampaignPostLink}
-                                        onRefreshStats={refreshCampaignStats}
                                       />
                                     ))}
                                   </SortableContext>
@@ -932,7 +916,7 @@ const LinksTable = () => {
                 className="p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                 title="Скопировать ссылку"
               >
-                <Copy className="w-3.5 h-3.5" />
+                <Copy className="w-4 h-4" />
               </button>
             </div>
             <div className="mt-4 flex justify-end">
