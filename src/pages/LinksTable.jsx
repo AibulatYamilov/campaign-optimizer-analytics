@@ -599,14 +599,12 @@ const LinksTable = () => {
   const refreshCampaignStats = (productId) => {
     setIsRefreshing(true);
     
-    // Simulate a data refresh with random changes to statistics
     setTimeout(() => {
       const updatedProducts = products.map(product => {
         if (product.id === productId) {
           return {
             ...product,
             campaigns: product.campaigns.map(campaign => {
-              // Generate random increments for each statistic
               const totalIncrement = Math.floor(Math.random() * 50) + 1;
               const weekIncrement = Math.floor(Math.random() * 20) + 1;
               const dayIncrement = Math.floor(Math.random() * 5) + 1;
@@ -626,7 +624,7 @@ const LinksTable = () => {
       setProducts(updatedProducts);
       setIsRefreshing(false);
       toast.success("Статистика успешно обновлена");
-    }, 1000); // Simulate a network delay
+    }, 1000);
   };
 
   return (
@@ -908,11 +906,49 @@ const LinksTable = () => {
       </div>
 
       <Dialog open={isGeneratedLinkDialogOpen} onOpenChange={setIsGeneratedLinkDialogOpen}>
-        {/* ... keep existing code (generated link dialog) */}
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-display">Реферальная ссылка создана</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="bg-gray-50 p-3 rounded-lg flex items-center justify-between">
+              <span className="text-sm text-gray-600 truncate mr-2">{generatedLink}</span>
+              <button 
+                onClick={() => copyToClipboard(generatedLink)}
+                className="p-1.5 text-gray-500 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+              >
+                <Copy className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-500 mt-4">
+              Используйте эту ссылку для отслеживания трафика с рекламной кампании
+            </p>
+          </div>
+        </DialogContent>
       </Dialog>
 
       <Dialog open={isLimitExceededDialogOpen} onOpenChange={setIsLimitExceededDialogOpen}>
-        {/* ... keep existing code (limit exceeded dialog) */}
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-display text-red-500">Достигнут лимит ссылок</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-700">
+              Вы достигли лимита в {userInfo.linksLimit} реферальных ссылок в текущем месяце.
+            </p>
+            <p className="text-gray-500 mt-2">
+              Для увеличения лимита перейдите на тарифный план PRO
+            </p>
+          </div>
+          <div className="flex gap-4">
+            <button className="flex-1 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 font-medium py-2.5 rounded-lg">
+              Остаться на текущем плане
+            </button>
+            <button className="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary transition-colors text-white font-medium py-2.5 rounded-lg shadow-md">
+              Перейти на PRO
+            </button>
+          </div>
+        </DialogContent>
       </Dialog>
     </div>
   );
