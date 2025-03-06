@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -309,6 +310,12 @@ const SortableCampaignRow = ({ campaign, productId, onUpdatePostLink, onRefreshS
               <div className="font-semibold">{campaign.lastDayViews.toLocaleString()}</div>
             </div>
           </div>
+          <button
+            onClick={() => onRefreshStats(productId, campaign.id)}
+            className="ml-4 p-1.5 text-gray-500 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
         </div>
       </TableCell>
     </TableRow>
@@ -812,7 +819,17 @@ const LinksTable = () => {
                     <CollapsibleContent>
                       <div className="pl-10 pr-2 py-3 animate-fade-up">
                         <div className="flex justify-between items-center mb-4">
-                          <h3 className="font-semibold text-gray-700">Рекламные кампании</h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-gray-700">Рекламные кампании</h3>
+                            <button 
+                              onClick={() => refreshAllCampaignsStats(product.id)}
+                              className="p-1.5 text-gray-500 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+                              disabled={isRefreshingStats === product.id}
+                            >
+                              <RefreshCw className={`w-4 h-4 ${isRefreshingStats === product.id ? 'animate-spin' : ''}`} />
+                            </button>
+                          </div>
+                          
                           <Dialog open={isAddCampaignDialogOpen} onOpenChange={setIsAddCampaignDialogOpen}>
                             <DialogTrigger asChild>
                               <button className="bg-gradient-to-r from-primary/20 to-primary/10 hover:from-primary/30 hover:to-primary/20 text-primary transition-colors px-4 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1 shadow-sm hover:shadow-md">
@@ -851,3 +868,166 @@ const LinksTable = () => {
                                   </div>
                                   <div className="grid gap-2">
                                     <label htmlFor="advertiser" className="text-sm font-medium">
+                                      Рекламодатель *
+                                    </label>
+                                    <Input
+                                      id="advertiser"
+                                      value={newCampaign.advertiser}
+                                      onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, advertiser: e.target.value})}
+                                      placeholder="Например: beauty_blog"
+                                      className="rounded-lg"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="grid gap-2">
+                                  <label htmlFor="advertiserLink" className="text-sm font-medium">
+                                    Ссылка на профиль рекламодателя
+                                  </label>
+                                  <Input
+                                    id="advertiserLink"
+                                    value={newCampaign.advertiserLink}
+                                    onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, advertiserLink: e.target.value})}
+                                    placeholder="https://instagram.com/example"
+                                    className="rounded-lg"
+                                  />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div className="grid gap-2">
+                                    <label htmlFor="startDate" className="text-sm font-medium">
+                                      Дата начала
+                                    </label>
+                                    <Input
+                                      id="startDate"
+                                      type="date"
+                                      value={newCampaign.startDate}
+                                      onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, startDate: e.target.value})}
+                                      className="rounded-lg"
+                                    />
+                                  </div>
+                                  <div className="grid gap-2">
+                                    <label htmlFor="cost" className="text-sm font-medium">
+                                      Стоимость размещения (₽)
+                                    </label>
+                                    <Input
+                                      id="cost"
+                                      type="number"
+                                      value={newCampaign.cost}
+                                      onChange={(e) => setNewCampaign({...newCampaign, productId: product.id, cost: e.target.value})}
+                                      placeholder="Например: 15000"
+                                      className="rounded-lg"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <button 
+                                onClick={handleAddCampaign}
+                                className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary transition-colors text-white font-medium py-2.5 rounded-lg shadow-md"
+                              >
+                                Сгенерировать ссылку
+                              </button>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                        
+                        {product.campaigns.length === 0 ? (
+                          <div className="text-center py-6 bg-gray-50 rounded-lg">
+                            <p className="text-gray-500">У данного товара пока нет кампаний. Нажмите "Добавить кампанию", чтобы создать.</p>
+                          </div>
+                        ) : (
+                          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                            <DndContext 
+                              sensors={sensors}
+                              collisionDetection={closestCenter}
+                              onDragEnd={(event) => handleCampaignDragEnd(event, product.id)}
+                            >
+                              <SortableContext 
+                                items={product.campaigns.map(campaign => campaign.id)}
+                                strategy={verticalListSortingStrategy}
+                              >
+                                <Table>
+                                  <TableHeader>
+                                    <TableRow>
+                                      <TableHead className="w-[5%]"></TableHead>
+                                      <TableHead>Кампания</TableHead>
+                                      <TableHead>Уникальная ссылка</TableHead>
+                                      <TableHead>Статистика переходов</TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody>
+                                    {product.campaigns.map((campaign) => (
+                                      <SortableCampaignRow
+                                        key={campaign.id}
+                                        campaign={campaign}
+                                        productId={product.id}
+                                        onUpdatePostLink={updateCampaignPostLink}
+                                        onRefreshStats={refreshCampaignStats}
+                                      />
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </SortableContext>
+                            </DndContext>
+                          </div>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                ))}
+              </SortableContext>
+            </DndContext>
+          )}
+        </div>
+      </div>
+      
+      {/* Generated Link Dialog */}
+      <Dialog open={isGeneratedLinkDialogOpen} onOpenChange={setIsGeneratedLinkDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-display">Ссылка сгенерирована</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-600 mb-4">Ваша уникальная ссылка для рекламной кампании создана. Скопируйте ее и передайте рекламодателю для размещения:</p>
+            <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-lg">
+              <div className="flex-1 overflow-hidden">
+                <div className="truncate text-gray-800 font-medium">
+                  {generatedLink}
+                </div>
+              </div>
+              <button 
+                onClick={() => copyToClipboard(generatedLink)}
+                className="p-2 bg-primary/10 text-primary hover:bg-primary/20 rounded-full transition-colors"
+              >
+                <Copy className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+          <div className="bg-primary/5 p-4 rounded-lg">
+            <h4 className="flex items-center gap-2 font-medium text-primary mb-2">
+              <Check className="w-4 h-4" />
+              Что дальше?
+            </h4>
+            <p className="text-sm text-gray-600">Передайте эту ссылку рекламодателю. Когда рекламная кампания будет запущена, добавьте ссылку на пост, чтобы легко отслеживать источник трафика.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Limit Exceeded Dialog */}
+      <Dialog open={isLimitExceededDialogOpen} onOpenChange={setIsLimitExceededDialogOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-display text-destructive">Лимит использован</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-600 mb-4">Вы достигли лимита по количеству сгенерированных ссылок в текущем месяце ({userInfo.linksLimit}).</p>
+            <p className="text-gray-600">Чтобы увеличить лимит, пожалуйста, обновите ваш тарифный план.</p>
+          </div>
+          <button className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary transition-colors text-white font-medium py-2.5 rounded-lg shadow-md">
+            Обновить тарифный план
+          </button>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default LinksTable;
