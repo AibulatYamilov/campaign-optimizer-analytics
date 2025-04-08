@@ -57,13 +57,6 @@ const Index = () => {
                 </button>
               </div>
             </div>
-            <div className="relative animate-fade-up opacity-0" style={{ animationDelay: "1s" }}>
-              <div className="absolute -top-8 -left-8 w-72 h-72 bg-primary/10 rounded-full filter blur-3xl"></div>
-              <div className="absolute -bottom-8 -right-8 w-72 h-72 bg-secondary/10 rounded-full filter blur-3xl"></div>
-              <div className="relative bg-white p-3 rounded-2xl shadow-2xl border border-gray-100">
-                <div className="rounded-xl shadow-md w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200"></div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -92,7 +85,6 @@ const Index = () => {
                   </div>
                 </div>
               </div>
-              <div className="w-full h-96 bg-gradient-to-br from-gray-100 to-gray-200"></div>
             </div>
           </div>
 
@@ -271,40 +263,35 @@ const Index = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="w-full h-72 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-xl border border-gray-100"></div>
-            </div>
-            <div>
-              <div className="space-y-6">
-                {[
-                  {
-                    title: "Полная прозрачность данных",
-                    description: "Получайте детальную информацию о каждой кампании, включая просмотры, клики и конверсии."
-                  },
-                  {
-                    title: "Удобное управление ссылками",
-                    description: "Создавайте, группируйте и отслеживайте все ваши рекламные ссылки в одном интерфейсе."
-                  },
-                  {
-                    title: "Автоматическая оптимизация",
-                    description: "Наши алгоритмы автоматически предлагают улучшения для повышения эффективности кампаний."
-                  },
-                  {
-                    title: "Интеграция с маркетплейсами",
-                    description: "Платформа интегрируется с популярными маркетплейсами для получения данных о продажах."
-                  },
-                ].map((item, index) => (
-                  <div key={index} className="flex gap-4 items-start">
-                    <div className="bg-primary/10 rounded-full p-1 mt-1">
-                      <Check className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-display text-lg font-bold mb-1">{item.title}</h3>
-                      <p className="text-gray-600">{item.description}</p>
-                    </div>
+            <div className="space-y-6">
+              {[
+                {
+                  title: "Полная прозрачность данных",
+                  description: "Получайте детальную информацию о каждой кампании, включая просмотры, клики и конверсии."
+                },
+                {
+                  title: "Удобное управление ссылками",
+                  description: "Создавайте, группируйте и отслеживайте все ваши рекламные ссылки в одном интерфейсе."
+                },
+                {
+                  title: "Автоматическая оптимизация",
+                  description: "Наши алгоритмы автоматически предлагают улучшения для повышения эффективности кампаний."
+                },
+                {
+                  title: "Интеграция с маркетплейсами",
+                  description: "Платформа интегрируется с популярными маркетплейсами для получения данных о продажах."
+                },
+              ].map((item, index) => (
+                <div key={index} className="flex gap-4 items-start">
+                  <div className="bg-primary/10 rounded-full p-1 mt-1">
+                    <Check className="w-5 h-5 text-primary" />
                   </div>
-                ))}
-              </div>
+                  <div>
+                    <h3 className="font-display text-lg font-bold mb-1">{item.title}</h3>
+                    <p className="text-gray-600">{item.description}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
