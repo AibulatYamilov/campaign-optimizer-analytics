@@ -61,11 +61,7 @@ const Index = () => {
               <div className="absolute -top-8 -left-8 w-72 h-72 bg-primary/10 rounded-full filter blur-3xl"></div>
               <div className="absolute -bottom-8 -right-8 w-72 h-72 bg-secondary/10 rounded-full filter blur-3xl"></div>
               <div className="relative bg-white p-3 rounded-2xl shadow-2xl border border-gray-100">
-                <img 
-                  src="/lovable-uploads/5d9383a0-eb4d-4460-ae6c-3afd51950dbe.png" 
-                  alt="Таблица рекламных кампаний" 
-                  className="rounded-xl shadow-md w-full"
-                />
+                <div className="rounded-xl shadow-md w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200"></div>
               </div>
             </div>
           </div>
@@ -96,11 +92,7 @@ const Index = () => {
                   </div>
                 </div>
               </div>
-              <img 
-                src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2072&q=80" 
-                alt="Таблица ссылок" 
-                className="w-full"
-              />
+              <div className="w-full h-96 bg-gradient-to-br from-gray-100 to-gray-200"></div>
             </div>
           </div>
 
@@ -280,11 +272,7 @@ const Index = () => {
 
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <img 
-                src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2072&q=80" 
-                alt="Аналитическая панель" 
-                className="rounded-2xl shadow-xl border border-gray-100"
-              />
+              <div className="w-full h-72 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-xl border border-gray-100"></div>
             </div>
             <div>
               <div className="space-y-6">
