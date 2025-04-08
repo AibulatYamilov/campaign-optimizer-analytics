@@ -1,3 +1,4 @@
+
 import { ChartBar, Users, DollarSign, Target, Rocket, Check, BarChart2, LineChart, Link2, ChevronRight, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -61,8 +62,8 @@ const Index = () => {
               <div className="absolute -bottom-8 -right-8 w-72 h-72 bg-secondary/10 rounded-full filter blur-3xl"></div>
               <div className="relative bg-white p-3 rounded-2xl shadow-2xl border border-gray-100">
                 <img 
-                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80" 
-                  alt="Аналитическая панель с таблицами" 
+                  src="/lovable-uploads/5d9383a0-eb4d-4460-ae6c-3afd51950dbe.png" 
+                  alt="Таблица рекламных кампаний" 
                   className="rounded-xl shadow-md w-full"
                 />
               </div>
