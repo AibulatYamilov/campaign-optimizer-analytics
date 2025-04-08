@@ -1,4 +1,3 @@
-
 import { ChartBar, Users, DollarSign, Target, Rocket, Check, BarChart2, LineChart, Link2, ChevronRight, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -42,23 +41,19 @@ const Index = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-left">
               <span className="inline-block px-4 py-1 bg-primary/10 rounded-full text-primary text-sm font-medium mb-6 animate-fade-up opacity-0" style={{ animationDelay: "0.2s" }}>
-                Ваш инструмент оптимизации маркетинга
+                Ваш инструмент анализа эффективности внешней рекламы
               </span>
               <h1 className="font-display text-5xl md:text-6xl font-bold mb-6 animate-fade-up opacity-0" style={{ animationDelay: "0.4s" }}>
-                Оптимизируйте рекламные кампании с помощью <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">data-driven аналитики</span>
+                Измеряйте реальную эффективность размещаемой рекламы — получайте <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">точные данные, а не догадки</span>
               </h1>
               <p className="text-gray-600 text-xl mb-8 animate-fade-up opacity-0" style={{ animationDelay: "0.6s" }}>
-                Принимайте взвешенные решения и максимизируйте ROI с нашей передовой аналитической платформой для продавцов маркетплейсов.
+                Вы платите за рекламу, но не знаете, кто реально приносит трафик? Легко отслеживайте реальные данные по всем кампаниям в одном месте.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 animate-fade-up opacity-0" style={{ animationDelay: "0.8s" }}>
                 <button className="bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary transition-all duration-300 px-8 py-3 rounded-full text-white font-medium shadow-lg flex items-center justify-center gap-2 hover:shadow-xl">
-                  Начать бесплатный период
+                  Поехали!
                   <ArrowRight className="w-4 h-4" />
                 </button>
-                <Link to="/links" className="border border-gray-200 px-8 py-3 rounded-full font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-                  Посмотреть демо
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
               </div>
             </div>
             <div className="relative animate-fade-up opacity-0" style={{ animationDelay: "1s" }}>
@@ -66,8 +61,8 @@ const Index = () => {
               <div className="absolute -bottom-8 -right-8 w-72 h-72 bg-secondary/10 rounded-full filter blur-3xl"></div>
               <div className="relative bg-white p-3 rounded-2xl shadow-2xl border border-gray-100">
                 <img 
-                  src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2072&q=80" 
-                  alt="Аналитическая панель" 
+                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80" 
+                  alt="Аналитическая панель с таблицами" 
                   className="rounded-xl shadow-md w-full"
                 />
               </div>
