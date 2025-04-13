@@ -43,3 +43,55 @@
 .glass-card {
   @apply backdrop-blur-lg bg-white/80 border border-white/20;
 }
+
+/* Gradient backgrounds */
+.bg-gradient-primary {
+  @apply bg-gradient-to-br from-primary to-secondary;
+}
+
+.bg-gradient-soft {
+  @apply bg-gradient-to-br from-primary/10 to-secondary/10;
+}
+
+/* Text gradients */
+.gradient-text {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-gradient-to-r from-primary to-secondary px-8 py-3 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300;
+}
+
+.btn-secondary {
+  @apply bg-white border border-gray-200 px-8 py-3 rounded-full font-medium shadow-sm hover:border-primary/20 transition-all duration-300;
+}
+
+/* Card styles */
+.feature-card {
+  @apply bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300;
+}
+
+/* Background pattern */
+.bg-grid-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Animation styles */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes fade-up {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out forwards;
+}
